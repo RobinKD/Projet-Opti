@@ -85,8 +85,17 @@ class IBEA :
 				if self.better(x, y):
 					retP.add(x)
 		return retP
-	def better(self, x, y):
-		return true
+	
+        def better(self, x, y): # used in matingsel method
+            # inequality <= for all objective functions
+            # and at least one strict inequality for one objective function
+
+            outputObjSpace_X = problem(x)
+            outputObjSpace_Y = problem(y)
+
+            """UNFINISHED (lol)"""
+
+            return true
 
 	def variation(self):
 
