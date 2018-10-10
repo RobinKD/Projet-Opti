@@ -6,6 +6,9 @@
 \usepackage{caption}
 \usepackage{commath}
 
+% TO DESCRIBE IBEA IN PSEUDO CODE
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
 
 \usepackage{fancyhdr} % Required for custom headers
 \usepackage{lastpage} % Required to determine the last page for the footer
@@ -45,13 +48,36 @@
 
 \section{Abstract}
 
-This report describes the implementation of an adaptive-IBEA with epsilon indicator (iteration-based evolutionary algorithm) in Python and its benchmarking with the COCO platform. The implemented algorithm is part of the multiobjective evolutionary algorithms (MOEAs). It aims at taking into account user preferences without requiring diversity preservation mechanism.
+This report describes the implementation of an adaptive-IBEA (iteration-based evolutionary algorithm) with epsilon indicator in Python and its benchmarking with the COCO platform. The implemented algorithm is part of the multiobjective evolutionary algorithms (MOEAs). It aims at taking into account user preferences without requiring diversity preservation mechanism. The present article will in its end present substantial graphics describing the algorithm performance.
 
 \section{Introduction}
 
+Adaptive IBEA is one MOEA + what is MOEA + why is it called iterative (or in next section describing algorithm with pseudo code ?)
+
+\section{The epsilon indicator}
+
+should we develop on the specificity of our indicator in constrast with the hypervolume one ? (default one on COCO right ? according to documentation)
+
 \section{Adaptive-IBEA with epsilon indicator}
 
+% pseudo code latex example:
+% https://tex.stackexchange.com/questions/163768/write-pseudo-code-in-latex
+
+\begin{algorithm}
+\caption{Adaptive IBEA}
+\begin{algorithmic}[1]
+\Procedure{Initialization}{}
+
+\EndProcedure
+\Procedure{Fitness assignment}{}
+
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
 \section{Python implementation}
+
+Python 3
 
 \section{Timing experiment}
 lien avec "We generally consider time to be the number of calls to the function f." ?
