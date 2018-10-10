@@ -6,11 +6,11 @@ https://www.tik.ee.ethz.ch/file/e8e3a4750b11117c05b4e00ac846c6ef/ZK2004a.pdf
 
 t should be as simple as calling the example experiment with 'bbob-biobj' as suite name. The call to 'fun' should return a vector with two entries in this case (the two objective vectors). Here is the most basic example to evaluate the biobjective bbob function 17 in dimension 5 (instance 11):
 
-In [1]:  import cocoex
-         suite = cocoex.Suite('bbob-biobj', '', '')
-         fun = suite.get_problem_by_function_dimension_instance(17, 5, 11)
-         fun([0, 1, 0.5, 0.7, 0.3])
-Out [1]: array([ 1.63665638e+06, -1.58054979e+02])
+    In [1]:  import cocoex
+             suite = cocoex.Suite('bbob-biobj', '', '')
+             fun = suite.get_problem_by_function_dimension_instance(17, 5, 11)
+            fun([0, 1, 0.5, 0.7, 0.3])
+    Out [1]: array([ 1.63665638e+06, -1.58054979e+02])
 
 
 I hope this helps to clarify that the biobjective BBOB problems are indeed returning vectors with the two objective function values. BTW, using a question-mark ("?") behind a command as well as tab-completion will typically help to understand the classes of the COCO code. For example on the above fun, I get:
