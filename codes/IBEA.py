@@ -53,7 +53,7 @@ class IBEA :
 		self.cur_objective=list()
 		for f in self.pbjective:
 			mi = min(P,f)
-			ma = max(P,f)
+			ma = max(P,fcurI)
 			self.cur_objective.append(lambda x: = f[x]-mi/(ma-mi))
 		self.cur_indic= self.indic(self.cur_objective)
 
