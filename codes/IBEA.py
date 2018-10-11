@@ -1,7 +1,7 @@
 import numpy as np
 
 def updateF(F,x):
-
+	pass
 
 
 
@@ -11,7 +11,7 @@ def updateF(F,x):
 
 def basicIBEA():
 	P= generate_pop()
-	while (m< N)
+	while (m< N):
 		F=fitness_adjutement(P)
 		
 		if arret():
@@ -46,15 +46,20 @@ class IBEA :
 	def fit(self):
 		self.F= dict()
 		vI= (lambda x: self.vectorize(self.curI)(P,{x}))
-		for x in P
+		for x in P:
 			self.F[x]= np.sum(np.exp(-vI(x)/(self.fit*self.cfit)))-1
 
 	def adaptative_fit():
 		self.cur_objective=list()
 		for f in self.pbjective:
 			mi = min(P,f)
+<<<<<<< HEAD
 			ma = max(P,fcurI)
 			self.cur_objective.append(lambda x: = f[x]-mi/(ma-mi))
+=======
+			ma = max(P,f)
+			self.cur_objective.append(lambda x: f[x]-mi/(ma-mi))
+>>>>>>> 14c8a2f3abca0b9651428db474a5767b1c0b167c
 		self.cur_indic= self.indic(self.cur_objective)
 
 		self.cfit= max(self.cur_indic(x,y) for x in P and y in P)
@@ -63,14 +68,14 @@ class IBEA :
 
 
 	def environemental_selection(self):
-	while len(P) > self.alpha:
-		x_0 = argmin(F)
-		del P[x]
-		updateF(x)
+		while len(P) > self.alpha:
+			x_0 = argmin(F)
+			del P[x]
+			updateF(x)
 
 
 	def updateF(self,x):
-		for y in self.P
+		for y in self.P:
 			self.F[y]+= np.exp(-I({x},{y})/(self.fit*self.cfit))
 
 
@@ -85,8 +90,17 @@ class IBEA :
 				if self.better(x, y):
 					retP.add(x)
 		return retP
-	def better(self, x, y):
-		return true
+	
+        def better(self, x, y): # used in matingsel method
+            # inequality <= for all objective functions
+            # and at least one strict inequality for one objective function
+
+            outputObjSpace_X = problem(x)
+            outputObjSpace_Y = problem(y)
+
+            """UNFINISHED (lol)"""
+
+            return true
 
 	def variation(self):
 
