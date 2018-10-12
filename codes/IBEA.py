@@ -29,37 +29,40 @@ def adaptativeIBEA():
 
 class IBEA :
 
-	def __init__(self, alpha,gen, fit, inidc, objective):
+	def __init__(self, alpha,gen, fit, indic, objective):
 		self.alpha  = alpha
 		self.gen = gen
 		self.fit = fit
 		self.cfit =0
-		self.I = inidc
+		self.I = indic
 		self.cur_gen =0
 		self.objective = objective
 		self.cur_objective
-		self.curI
+		self.cur_indic
 		self.P = set()
 		self.F = dict()
 
 	
 	def fit(self):
+		"""
+			Basic IBEA step 1, map x in P to F(x)
+		"""
 		self.F= dict()
-		vI= (lambda x: self.vectorize(self.curI)(P,{x}))
+		vI= (lambda x: self.vectorize(self.cur_indic)(P,{x}))
 		for x in P:
 			self.F[x]= np.sum(np.exp(-vI(x)/(self.fit*self.cfit)))-1
 
-	def adaptative_fit():
+	def addaptive_fit(self):
+		"""
+			Adaptive IBEA, rescale les fonctions objectif dans cur_objective construit cur_indic  en fonctions de ces nouvelles fonctions.
+			Pas fini
+
+		"""
 		self.cur_objective=list()
 		for f in self.pbjective:
 			mi = min(P,f)
-<<<<<<< HEAD
 			ma = max(P,fcurI)
 			self.cur_objective.append(lambda x: = f[x]-mi/(ma-mi))
-=======
-			ma = max(P,f)
-			self.cur_objective.append(lambda x: f[x]-mi/(ma-mi))
->>>>>>> 14c8a2f3abca0b9651428db474a5767b1c0b167c
 		self.cur_indic= self.indic(self.cur_objective)
 
 		self.cfit= max(self.cur_indic(x,y) for x in P and y in P)
@@ -68,6 +71,9 @@ class IBEA :
 
 
 	def environemental_selection(self):
+		"""
+			step 3
+		"""
 		while len(P) > self.alpha:
 			x_0 = argmin(F)
 			del P[x]
@@ -80,10 +86,15 @@ class IBEA :
 
 
 	def terminaision(self): 
-		""" TODO"""	
+		""" 
+			Sep4
+		"""	
 		return self.gen > self.cur_gen
 
 	def matingsel(self):
+		"""
+			step 5
+		"""
 		retP= set()
 		for x in sefl.P:
 			for y in self.P:
@@ -91,19 +102,22 @@ class IBEA :
 					retP.add(x)
 		return retP
 	
-        def better(self, x, y): # used in matingsel method
-            # inequality <= for all objective functions
-            # and at least one strict inequality for one objective function
+	def better(self, x, y): 
+		"""
+			
+		"""
 
-            outputObjSpace_X = problem(x)
-            outputObjSpace_Y = problem(y)
+		outputObjSpace_X = problem(x)
+		outputObjSpace_Y = problem(y)
 
-            """UNFINISHED (lol)"""
+		"""UNFINISHED (lol)"""
 
-            return true
+				return true
 
 	def variation(self):
-
+		"""
+			step 6
+		"""
 		return P
 
 	def generate_pop(self):
