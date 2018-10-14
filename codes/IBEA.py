@@ -8,34 +8,16 @@ def updateF(F,x):
 #suppose I(x,x)=0 
 
 
-
-def basicIBEA():
-	P= generate_pop()
-	while (m< N):
-		F=fitness_adjutement(P)
-		
-		if arret():
-			return non_dominated(P)
-		P = bin_tournament(P)
-		P= mutations(P)
-		m+=1
-
-def adaptativeIBEA():
-	P= generate_pop()
-	for i in range(dim):
-		mi, ma = get_bounds
-	F,P= environemental_selection
-
+ 
 
 class IBEA :
-
 	def __init__(self, alpha,gen, fit, indic, objective):
-		self.alpha  = alpha
-		self.gen = gen
-		self.fit = fit
+		self.alpha  = alpha 
+		self.gen = gen# nbde génération max
+		self.fit = fit 
 		self.cfit =0
 		self.I = indic
-		self.cur_gen =0
+		self.cur_gen =0 # compteur de génération
 		self.objective = objective
 		self.cur_objective
 		self.cur_indic
@@ -48,8 +30,8 @@ class IBEA :
 			Basic IBEA step 1, map x in P to F(x)
 		"""
 		self.F= dict()
-		vI= (lambda x: self.vectorize(self.cur_indic)(P,{x}))
-		for x in P:
+		vI= (lambda x: np.vectorize(self.cur_indic)(self.P,{x}))
+		for x in self.P:
 			self.F[x]= np.sum(np.exp(-vI(x)/(self.fit*self.cfit)))-1
 
 	def addaptive_fit(self):
@@ -59,13 +41,14 @@ class IBEA :
 
 		"""
 		self.cur_objective=list()
-		for f in self.pbjective:
-			mi = min(P,f)
-			ma = max(P,fcurI)
-			self.cur_objective.append(lambda x: = f[x]-mi/(ma-mi))
-		self.cur_indic= self.indic(self.cur_objective)
+		for f in self.objective:
+			mi = min([(f(x),x) for x in self.P])[1]
+			ma = max([(f(x),x) for x in self.P])[1]
+			self.cur_objective.append(lambda x:  f[x]-mi/(ma-mi))
+		self.cur_indic= self.I(self.cur_objective)
 
-		self.cfit= max(self.cur_indic(x,y) for x in P and y in P)
+		self.cfit= np.max(np.vectorize(self.cur_indic)(self.P, self.P))
+		#self.cfit= max([self.cur_indic(x,y) for x in self.Pand y in self.P])
 		self.fit()
 		return 
 
@@ -74,18 +57,18 @@ class IBEA :
 		"""
 			step 3
 		"""
-		while len(P) > self.alpha:
-			x_0 = argmin(F)
-			del P[x]
+		while len(self.P) > self.alpha:
+			x= np.argmin(self.F)
+			del self.P[x]
 			updateF(x)
 
 
-	def updateF(self,x):
+	def updateF(self, el):
 		for y in self.P:
-			self.F[y]+= np.exp(-I({x},{y})/(self.fit*self.cfit))
+			self.F[y]+= np.exp(-self.I({el},{y})/(self.fit*self.cfit))
 
 
-	def terminaision(self): 
+	def terminaison(self): 
 		""" 
 			Sep4
 		"""	
@@ -96,7 +79,7 @@ class IBEA :
 			step 5
 		"""
 		retP= set()
-		for x in sefl.P:
+		for x in self.P:
 			for y in self.P:
 				if self.better(x, y):
 					retP.add(x)
@@ -106,27 +89,29 @@ class IBEA :
 		"""
 			
 		"""
+		x=None 
+		y=None
 
-		outputObjSpace_X = problem(x)
-		outputObjSpace_Y = problem(y)
+		#outputObjSpace_X = problem(x)
+		#outputObjSpace_Y = problem(y)
 
 		"""UNFINISHED (lol)"""
 
-				return true
+		return True
 
 	def variation(self):
 		"""
 			step 6
 		"""
-		return P
+		return self.P
 
 	def generate_pop(self):
 		return set()
 
 	def run(self):
 		self.generate_pop()
-		while not terminaision():
-			self.fitness_adjutement()
+		while not self.terminaison():
+			self.addaptive_fit()
 			self.environemental_selection()
 			mat = self.matingsel()
 			self.variation()
