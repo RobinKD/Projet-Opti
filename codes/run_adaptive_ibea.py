@@ -59,9 +59,7 @@ from cocoex import default_observers  # see cocoex.__init__.py
 from cocoex.utilities import ObserverOptions, ShortInfo, ascetime, print_flush
 from cocoex.solvers import random_search
 
-import IBEA
 import myIBEA
-import MatingVariation
 
 def default_observer_options(budget_=None, suite_name_=None, current_batch_=None):
     """return defaults computed from input parameters or current global vars
@@ -182,7 +180,7 @@ def coco_optimize(solver, fun, max_evals, max_runs=1e9):
 ############################ ADD HERE ########################################
         # ### IMPLEMENT HERE THE CALL TO ANOTHER SOLVER/OPTIMIZER ###
         elif solver.__name__ == "myIBEA":
-            solver(fun, 100, 50, 0.05)
+            solver(fun, 25, 20, 0.05)
 ##############################################################################
         else:
             solver(fun, x0)
@@ -218,7 +216,7 @@ current_batch = 1      # 1..number_of_batches
 # SOLVER = optimize.fmin_cobyla
 SOLVER = myIBEA.myIBEA # SOLVER = fmin_slsqp # SOLVER = cma.fmin
 suite_instance = "" # "year:2016"
-suite_options = "dimensions: 2"  # "dimensions: 2,3,5,10,20 "  # if 40 is not desired
+suite_options = "dimensions: 2,3,5"  # "dimensions: 2,3,5,10,20 "  # if 40 is not desired
 # for more suite options, see http://numbbo.github.io/coco-doc/C/#suite-parameters
 observer_options = ObserverOptions({  # is (inherited from) a dictionary
                     'algorithm_info': '"An Adaptive IBEA algorithm"', # CHANGE/INCOMMENT THIS!

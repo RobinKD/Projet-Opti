@@ -7,6 +7,10 @@ def eps_indic(i, j, fun):
     epsilon = fun_a - fun_b
     if epsilon[0] < 0 and epsilon[1] < 0:
         return max(epsilon)
+    elif epsilon[0] > 0 and epsilon[1] < 0:
+        return epsilon[0]
+    elif epsilon[0] < 0 and epsilon[1] > 0:
+        return epsilon[1]
     else:
         return min(epsilon)
 
@@ -44,9 +48,13 @@ class IBEA :
             scaled_f = np.array([self.fun(x) for x in self.P])
         scaled_f_transp = scaled_f.T
         lbound = np.array([min(scaled_f_transp[0]), min(scaled_f_transp[1])])
-        # print("\nlbound", lbound)
+        #print("lbound", lbound)
         ubound = np.array([max(scaled_f_transp[0]), max(scaled_f_transp[1])])
-        # print("\nubound", ubound)
+        #print("ubound", ubound)
+        div_bound = ubound - lbound
+        if div_bound[0] == 0 or div_bound[1] == 0:
+            print("div by zero will happen", ubound, lbound)
+            print("Scaled f is", scaled_f_transp)
         for i, k in enumerate(scaled_f):
             # print("Op : ", scaled_f[i], "-", lbound, "/(", ubound, " - ", lbound, ")")
             scaled_f[i] = (np.array(scaled_f[i]) - lbound)/(ubound - lbound)
@@ -59,12 +67,15 @@ class IBEA :
                     self.indic[i][j] = 0 # None quand indicateur avec lui meme 
         # print("\nself.indic", self.indic)
         max_indic = np.amax(self.indic)
-        print("\nmax_indic", max_indic)
+        #print("max_indic", max_indic)
         min_indic = np.amin(self.indic)
         # print("\nmin_indic", min_indic)
         for i, x1 in enumerate(self.P):
             self.F[i] = 0
-            indic_x1 = np.array([self.indic[i][j] for j, y in enumerate(self.P) if i != j])
+            indic_x1 = np.array([self.indic[j][i] for j, y in enumerate(self.P) if i != j])
+            if (max_indic * self.fit_scale) == 0:
+                print("Div by zero will happen", max_indic, self.fit_scale)
+                print("Indicator values", self.indic)
             self.F[i] = np.sum(-np.exp(-indic_x1/(max_indic * self.fit_scale)))
         # print("\nEnd adaptive fit")
         # print("\nFitness values" , self.F)
@@ -91,11 +102,11 @@ class IBEA :
             self.updateF(x, tmp_indic)
 
 
-    def generate_pop(self):
-        return np.array([np.random.rand(self.fun.dimension) for i in range(self.alpha)])
+    # def generate_pop(self):
+    #     return np.array([np.random.rand(self.fun.dimension) for i in range(self.alpha)])
 
     def run(self):
-        self.P = self.generate_pop()
+        self.P = mv.generateInitialPopulation(self.alpha, self.fun.dimension, 5, -5)
         gen_counter = 0
         while gen_counter < self.max_gen:
             self.adaptive_fit()
