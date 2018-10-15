@@ -111,7 +111,7 @@ class IBEA :
         while gen_counter < self.max_gen:
             self.adaptive_fit()
             self.environmental_selection()
-            matingPool = mv.binary_tour_sel(self.P)
+            matingPool = mv.binary_tour_sel(self.P, self.F)
             matingPool = mv.recombination(matingPool)
             matingPool = mv.mutation(matingPool)
             self.P = np.concatenate((self.P, matingPool), axis=0)

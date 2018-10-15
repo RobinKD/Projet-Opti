@@ -82,7 +82,7 @@ and a variablewise polynomial mutation operator (ηm = 20).
 '''
 
 #Mating selection
-def binary_tour_sel(P):
+def binary_tour_sel(P, fit_values):
     """Mating selection aims at picking promising solutions for variation and
     usually is performed in a randomized fashion. Perform binary tournament 
     selection with replacement on P in order to fill the temporary mating pool P_
@@ -94,10 +94,9 @@ def binary_tour_sel(P):
     for i in range(P.shape[0]): #We want to have the same size as the original population
         a = np.random.randint(P.shape[0],size=1) #random pick one individual a
         b = np.random.randint(P.shape[0],size=1) #random pick one individual b
-        #TODO 
         #Which one fitness value is better
         #if fitness(P[a,])>fitness(P[b,]) :
-        if P[a,1]>P[b,1] :
+        if fit_values[a] > fit_values[b] :
             better_one = P[a,][0].reshape(1,P.shape[1])
         else:
             better_one = P[b,][0].reshape(1,P.shape[1])
@@ -196,11 +195,11 @@ def recombination(P_,recom_rate=1.0,mu=25):
     return P_  
 
 import numpy as np
-#Generate a random population with size 100 and each one has 20 chromosomes
-a = np.random.random((100,20))
-P_ = binary_tour_sel(a)
-print(P_.shape)
-P_ = recombination(P_)
-print(P_.shape)
-P_ = mutation(P_)
-print(P_.shape)
+# #Generate a random population with size 100 and each one has 20 chromosomes
+# a = np.random.random((100,20))
+# P_ = binary_tour_sel(a)
+# print(P_.shape)
+# P_ = recombination(P_)
+# print(P_.shape)
+# P_ = mutation(P_)
+# print(P_.shape)
