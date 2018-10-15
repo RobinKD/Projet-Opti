@@ -1,4 +1,79 @@
 '''
+initial population generation
+'''
+
+def generateInitialPopulation(popSize,popDim,upperBound,lowerBound):
+    """
+    - generate an initial random population of popSize numpy arrays of popDim dimensions which
+    coordinates belong to [lowerBound,upperBound]
+
+    - population will be returned as a 2D numpy array, a line of which being the coordinates
+    of one population member
+    """
+    popRange = upperBound-lowerBound
+    pop2DArray = np.random.rand(popSize,popDim)
+    pop2DArray *= popRange
+    pop2DArray -= round(popRange/2) # to work on zero centered interval - COCO works on [-5;5] ?
+    return(pop2DArray)
+
+'''
+environmental selection
+'''
+
+def envirSelection(pop,matingPoolPop,fitValuePop,fitValueMatingPoolPop):
+    """
+    - environmental selection determines which individuals of the population and the modified
+    mating pool form the new population. The simplest way is to use the latter set as the
+    new population. An alternative is to combine both sets and deterministically choose
+    the best individuals for survival
+
+    - on a 2*pop.size on doit revenir à pop.size en conservant les meilleurs candidats
+
+    - on suppose le travail en numpy array: 1 array pour les coordonnées dans le decision space,
+    1 array pour les fitness values, 1 array pour les objective functions evalutions, l'indice permettant de lier
+    les éléments de l'un avec les éléments des autres
+
+    - pour ne pas confondre les indexes on incrémente les indexes associés à la mating pool de popSize
+    """
+    wantedPopSize = pop.shape[0]
+
+    # whole population fit value indexes numpy array initialization
+    indexArrayInitialPop = np.empty((wantedPopSize,))
+    indexArrayMatingPop = np.empty((wantedPopSize,))
+    for indexArrayIndex in range(wantedPopSize):
+        indexArrayInitialPop[indexArrayIndex] = indexArrayIndex
+        indexArrayMatingPop[indexArrayIndex] = indexArrayIndex + wantedPopSize
+
+    # we add a dimension to put the indexes associated with the decision vectors in each population
+    # NB: indexes associated with mating pool decision vectors will start at wantedPopSize
+    fitValuePop_temp = np.empty((fitValuePop.shape[0],2))
+    fitValueMatingPoolPop_temp = np.empty((fitValueMatingPoolPop.shape[0],2))
+
+    # we copy the fit values in each temp vector
+    # and the associated index (describing the position in the initial numpy arrays of fitness values) in
+    # the second column. NB: if index belongs to mating pool value is (index + wantedPopSize)
+    fitValuePop_temp[:,0] = fitValuePop[:,0]
+    fitValuePop_temp[:,1] = indexArrayInitialPop[:,0]
+    fitValueMatingPoolPop_temp[:,0] = fitValueMatingPoolPop[:,0]
+    fitValueMatingPoolPop_temp[:,1] = indexArrayMatingPop[:,0]
+
+    fitValueMatingAndInitial = np.concatenate((fitValuePop_temp,fitValueMatingPoolPop_temp),axis=0)
+
+    # retrait des x* jusqu'à atteindre la taille de population initiale
+    while fitValueMatingAndInitial.shape[0] > wantedPopSize:
+        # regarding code line below: axis = 0 to sort according to fitness value and not index value
+        fitValueMatingAndInitial = np.ndarray.sort(axis=0, kind='quicksort')
+
+        # dans le adaptive IBEA il faut enlever le candidat du decision space avec le plus petit fitness
+        # value avant de sélectionner
+        fitValueMatingAndInitial = fitValueMatingAndInitial[1:,:,:]
+
+        # we update the fitness values for the remaining population
+
+    # renvoie des decision vectors en numpy array de taille (popSize,nbrDimDecisionSpace)
+    return(newPop)
+
+'''
 The crossover probability of 1.0 and mutation probability of 1/n are used
 The recombination and mutation probabilities were set to 1.0 and to 0.01 resp.
 NSGA-II nd SPEA2 with a population size of 100 is run
