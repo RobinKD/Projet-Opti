@@ -60,6 +60,9 @@ from cocoex.utilities import ObserverOptions, ShortInfo, ascetime, print_flush
 from cocoex.solvers import random_search
 
 import myIBEA
+size_pop = 25
+nb_max_gen = 20
+scale_factor = 0.05
 
 def default_observer_options(budget_=None, suite_name_=None, current_batch_=None):
     """return defaults computed from input parameters or current global vars
@@ -73,12 +76,16 @@ def default_observer_options(budget_=None, suite_name_=None, current_batch_=None
         current_batch_ = current_batch
     opts = {}
     try:
-        opts.update({'result_folder': '"%s_on_%s%s_budget%04dxD"'
+        opts.update({'result_folder': '"%s_on_%s%s_budget%04dxD-sizePop%d-max_gen%d-scaleFact%s"'
                     % (SOLVER.__name__,
                        suite_name_,
                        "" if current_batch_ is None
                           else "_batch%03dof%d" % (current_batch_, number_of_batches),
-                       budget_)})
+                       budget_,
+                       size_pop,
+                       nb_max_gen,
+                       str(scale_factor)
+                    )})
     except: pass
     try:
         solver_module = '(%s)' % SOLVER.__module__
@@ -180,7 +187,7 @@ def coco_optimize(solver, fun, max_evals, max_runs=1e9):
 ############################ ADD HERE ########################################
         # ### IMPLEMENT HERE THE CALL TO ANOTHER SOLVER/OPTIMIZER ###
         elif solver.__name__ == "myIBEA":
-            solver(fun, 25, 20, 0.05)
+            solver(fun, size_pop, nb_max_gen, scale_factor)
 ##############################################################################
         else:
             solver(fun, x0)
