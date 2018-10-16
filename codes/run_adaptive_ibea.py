@@ -60,7 +60,7 @@ from cocoex.utilities import ObserverOptions, ShortInfo, ascetime, print_flush
 from cocoex.solvers import random_search
 
 import myIBEA
-size_pop = 50
+size_pop = 100
 nb_max_gen = 50
 scale_factor = 0.05
 

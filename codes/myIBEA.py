@@ -5,14 +5,15 @@ def eps_indic(i, j, fun):
     fun_a = fun[i]
     fun_b = fun[j]
     epsilon = fun_a - fun_b
-    if epsilon[0] < 0 and epsilon[1] < 0:
-        return max(epsilon)
-    elif epsilon[0] > 0 and epsilon[1] < 0:
-        return epsilon[0]
-    elif epsilon[0] < 0 and epsilon[1] > 0:
-        return epsilon[1]
-    else:
-        return max(epsilon)
+    # if epsilon[0] < 0 and epsilon[1] < 0:
+    #     return max(epsilon)
+    # elif epsilon[0] > 0 and epsilon[1] < 0:
+    #     return epsilon[0]
+    # elif epsilon[0] < 0 and epsilon[1] > 0:
+    #     return epsilon[1]
+    # else:
+    #     return max(epsilon)
+    return max(epsilon)
 
 def myIBEA(fun, pop_size, num_max_gen, fit_scale_fact):
     ibea = IBEA(pop_size, num_max_gen, fit_scale_fact, fun)
@@ -41,10 +42,9 @@ class IBEA :
         # self.cur_objective
         # self.curI
         self.P = np.zeros(alpha)
-        # self.F = dict()
-        # self.indic = dict()
         self.F = np.zeros(alpha)
         self.indic = np.zeros((alpha, alpha))
+
 
     def adaptive_fit(self):
         taille_pop = len(self.P)
@@ -74,7 +74,7 @@ class IBEA :
                 if i != j:
                     self.indic[i][j] = eps_indic(i, j, scaled_f)
                 else:
-                    self.indic[i][j] = 0 # None quand indicateur avec lui meme 
+                    self.indic[i][j] = 0 # None quand indicateur avec lui meme
         # print("\nself.indic", self.indic)
         max_indic = np.amax(self.indic)
         #print("max_indic", max_indic)
@@ -110,10 +110,6 @@ class IBEA :
             self.indic = np.delete(self.indic, x, axis=0)
             self.F = np.delete(self.F, x, axis=0)
             self.updateF(x, tmp_indic)
-
-
-    # def generate_pop(self):
-    #     return np.array([np.random.rand(self.fun.dimension) for i in range(self.alpha)])
 
     def run(self):
         self.P = mv.generateInitialPopulation(self.alpha, self.fun.dimension, 5, -5)
