@@ -46,3 +46,20 @@ Recommended content of the paper:
 # Proposed LaTeX package for pseudo code
 
 algorithmicx, see https://tex.stackexchange.com/questions/163768/write-pseudo-code-in-latex
+
+# To run on your computers
+
+Make sure that this line
+
+    sys.path.append("../coco")
+at the beginning of run_adaptive_ibea.py has the correct path to your coco directory
+
+then in the directory containing run_adaptive_ibea.py
+
+    python run_adaptive_ibea.py 10 1 5
+10 is for the budget, the bigger, the longer the execution
+1 is the current batch of the execution
+5 is the number of batches.
+Run it on all dimensions (check it near the end of run_adaptive)
+and choose a different number if you want to run it
+
