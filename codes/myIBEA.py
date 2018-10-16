@@ -12,11 +12,21 @@ def eps_indic(i, j, fun):
     elif epsilon[0] < 0 and epsilon[1] > 0:
         return epsilon[1]
     else:
-        return min(epsilon)
+        return max(epsilon)
 
 def myIBEA(fun, pop_size, num_max_gen, fit_scale_fact):
     ibea = IBEA(pop_size, num_max_gen, fit_scale_fact, fun)
     ibea.run()
+
+def unique_pop(pop, eps):
+    unique = np.unique(pop, axis=0)
+    same = True
+    for x in unique:
+        dist = np.linalg.norm(unique[0] - x)
+        if dist > eps:
+            same = False
+            continue
+    return same
 
 
 class IBEA :
@@ -53,8 +63,8 @@ class IBEA :
         #print("ubound", ubound)
         div_bound = ubound - lbound
         if div_bound[0] == 0 or div_bound[1] == 0:
-            print("div by zero will happen", ubound, lbound)
-            print("Scaled f is", scaled_f_transp)
+            print("div by zero will happen", ubound, lbound, unique_pop(self.P))
+            # print("Scaled f is", scaled_f_transp)
         for i, k in enumerate(scaled_f):
             # print("Op : ", scaled_f[i], "-", lbound, "/(", ubound, " - ", lbound, ")")
             scaled_f[i] = (np.array(scaled_f[i]) - lbound)/(ubound - lbound)
@@ -107,8 +117,11 @@ class IBEA :
 
     def run(self):
         self.P = mv.generateInitialPopulation(self.alpha, self.fun.dimension, 5, -5)
+        # ubound = self.fun.upper_bounds
+        # lbound = self.fun.lower_bounds
+        # self.P = mv.generateInitialPopulation(self.alpha, self.fun.dimension, ubound, lbound)
         gen_counter = 0
-        while gen_counter < self.max_gen:
+        while gen_counter < self.max_gen and not unique_pop(self.P, 0.000001):
             self.adaptive_fit()
             self.environmental_selection()
             matingPool = mv.binary_tour_sel(self.P, self.F)

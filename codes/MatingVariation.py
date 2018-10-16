@@ -13,7 +13,7 @@ def generateInitialPopulation(popSize,popDim,upperBound,lowerBound):
     popRange = upperBound-lowerBound
     pop2DArray = np.random.rand(popSize,popDim)
     pop2DArray *= popRange
-    pop2DArray -= round(popRange/2) # to work on zero centered interval - COCO works on [-5;5] ?
+    pop2DArray -= np.round(popRange/2) # to work on zero centered interval - COCO works on [-5;5] ?
     return(pop2DArray)
 
 '''
