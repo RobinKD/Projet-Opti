@@ -44,6 +44,7 @@ class IBEA :
         self.P = np.zeros(alpha)
         self.F = np.zeros(alpha)
         self.indic = np.zeros((alpha, alpha))
+        self.max_indic = 0
 
 
     def adaptive_fit(self):
@@ -65,9 +66,11 @@ class IBEA :
         if div_bound[0] == 0 or div_bound[1] == 0:
             print("div by zero will happen", ubound, lbound, unique_pop(self.P))
             # print("Scaled f is", scaled_f_transp)
-        for i, k in enumerate(scaled_f):
-            # print("Op : ", scaled_f[i], "-", lbound, "/(", ubound, " - ", lbound, ")")
-            scaled_f[i] = (np.array(scaled_f[i]) - lbound)/(ubound - lbound)
+        # for i, k in enumerate(scaled_f):
+        #     # print("Op : ", scaled_f[i], "-", lbound, "/(", ubound, " - ", lbound, ")")
+        #     scaled_f[i] = (np.array(scaled_f[i]) - lbound)/(ubound - lbound)
+        scaled_f -= lbound
+        scaled_f *= np.array([1,1])/(ubound - lbound)
         # print("scaled_f", scaled_f)
         for i, x1 in enumerate(self.P):
             for j, x2 in enumerate(self.P):
@@ -76,23 +79,21 @@ class IBEA :
                 else:
                     self.indic[i][j] = 0 # None quand indicateur avec lui meme
         # print("\nself.indic", self.indic)
-        max_indic = np.amax(self.indic)
+        self.max_indic = np.amax(np.absolute(self.indic))
         #print("max_indic", max_indic)
-        min_indic = np.amin(self.indic)
-        # print("\nmin_indic", min_indic)
         for i, x1 in enumerate(self.P):
-            self.F[i] = 0
             indic_x1 = np.array([self.indic[j][i] for j, y in enumerate(self.P) if i != j])
-            if (max_indic * self.fit_scale) == 0:
-                print("Div by zero will happen", max_indic, self.fit_scale)
+            if (self.max_indic * self.fit_scale) == 0:
+                print("Div by zero will happen", self.max_indic, self.fit_scale)
                 print("Indicator values", self.indic)
-            self.F[i] = np.sum(-np.exp(-indic_x1/(max_indic * self.fit_scale)))
+            diviseur = 1 / (self.max_indic * self.fit_scale)
+            self.F[i] = np.sum(-np.exp(-indic_x1 * diviseur))
         # print("\nEnd adaptive fit")
         # print("\nFitness values" , self.F)
 
     def updateF(self, ind, tmp_indic):
         for i, fitness in enumerate(self.F):
-            self.F[i] = fitness + np.exp(-tmp_indic[ind][i])
+            self.F[i] = fitness + np.exp(-tmp_indic[ind][i]/(self.max_indic * self.fit_scale))
 
     def environmental_selection(self):
         # print("\nNew environmental selection")
