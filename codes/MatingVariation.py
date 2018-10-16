@@ -96,7 +96,7 @@ def binary_tour_sel(P, fit_values):
         b = np.random.randint(P.shape[0],size=1) #random pick one individual b
         #Which one fitness value is better
         #if fitness(P[a,])>fitness(P[b,]) :
-        if fit_values[a] > fit_values[b] :
+        if fit_values[a[0]] > fit_values[b[0]] :
             better_one = P[a,][0].reshape(1,P.shape[1])
         else:
             better_one = P[b,][0].reshape(1,P.shape[1])
