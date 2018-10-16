@@ -60,8 +60,8 @@ from cocoex.utilities import ObserverOptions, ShortInfo, ascetime, print_flush
 from cocoex.solvers import random_search
 
 import myIBEA
-size_pop = 100
-nb_max_gen = 50
+size_pop = 200
+nb_max_gen = 100
 scale_factor = 0.05
 
 def default_observer_options(budget_=None, suite_name_=None, current_batch_=None):
