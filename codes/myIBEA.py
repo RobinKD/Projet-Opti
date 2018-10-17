@@ -15,9 +15,18 @@ def eps_indic(i, j, fun):
     #     return max(epsilon)
     return max(epsilon)
 
+
+#import cProfile, pstats
+#from pstats import SortKey
 def myIBEA(fun, pop_size, num_max_gen, fit_scale_fact):
     ibea = IBEA(pop_size, num_max_gen, fit_scale_fact, fun)
+    #pr = cProfile.Profile()
+    #pr.enable()
     ibea.run()
+    pr.disable()
+    #sortby = SortKey.CUMULATIVE
+    #ps = pstats.Stats(pr).sort_stats(sortby)
+    #ps.print_stats()
 
 def unique_pop(pop, eps):
     unique = np.unique(pop, axis=0)
