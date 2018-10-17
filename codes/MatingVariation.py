@@ -120,7 +120,7 @@ https://www.iitk.ac.in/kangal/papers/k2012016.pdf
 Polynomial mutation
 Gaussien mutation
 '''
-def mutation(P_,mut_rate=0.01,mu=25):
+def mutation(P_,mut_rate=0.01,mu=1):
     """the mutation operator modifies individuals by changing small 
     parts in the associated vectors according to a given mutation rate.
     
@@ -158,7 +158,7 @@ parent solutions and a small value of η allows distant solutions to be selected
 SBX operator http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.85.7460&rep=rep1&type=pdf
 SBX_Adap operator http://www.cs.bham.ac.uk/~wbl/biblio/gecco2007/docs/p1187.pdf
 '''
-def recombination(P_,recom_rate=1.0,mu=25):
+def recombination(P_,recom_rate=1.0,mu=1):
     """The recombination operator takes a certain number of parents and creates a 
     predefined number of children by combining parts of the parents. To mimic the 
     stochastic nature of evolution, a crossover probability is associated with this
