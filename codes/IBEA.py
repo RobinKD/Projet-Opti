@@ -32,10 +32,11 @@ class IBEA :
 			Basic IBEA step 1, map x in P to F(x)
 			calculle pour tout x_1 de p : $\sum_{x_2\in P\{x1\}}-e^{-I({x_2,x_1})/k}$
 		"""
-		self.F= dict()
+		#self.F.clear()
 		#vI= (lambda x: np.vectorize(self.cur_indic)(np.array(list(self.P)),x))
+		scale = self.fitval*self.cfit
 		for x in self.P:
-			self.F[x]= -np.sum(np.exp(np.array([-self.cur_indic[(y,x)] for y in self.P])/(self.fitval*self.cfit)))+1
+			self.F[x]= -np.sum(np.exp(np.array([-self.cur_indic[(y,x)] for y in self.P])/scale))+1
 
 	def addaptive_fit(self):
 		"""
@@ -45,13 +46,15 @@ class IBEA :
 		
 		# rescale objective
 		#fx= [self.objective(x) for x in self.P]
+
 		for x in self.P:
-			self.static_objective[x]= self.objective(x)
+			if x not in self.static_objective:
+				self.static_objective[x]= self.objective(x)
 		fx= list(self.static_objective.values())
 		mi = np.min(fx,axis= 0)
 		ma = np.max(fx,axis= 0)
+
 		self.cur_objective.clear()
-		
 		for x in self.P:
 			self.cur_objective[x]= self.static_objective[x]*(ma-mi)-mi
 		#self.cur_indic= (lambda a,b :self.I(self.cur_objective, a,b))
@@ -59,12 +62,11 @@ class IBEA :
 		self.cur_indic.clear()
 		self.cfit= 0
 
-		for x in self.P:
-			for y in self.P:
-				cur= self.I(self.cur_objective[x],self.cur_objective[y])
+		for x, obx in self.cur_objective.items():
+			for y, oby in self.cur_objective.items():
+				cur= self.I(obx, oby)
 				self.cur_indic[(x,y)]= cur
 				self.cfit+=cur
-		#self.cfit = max(self.cur_indic(x,y) for x in self.P for y in self.P)
 		self.fit()
 		return 
 
@@ -76,6 +78,7 @@ class IBEA :
 		while len(self.P) > self.alpha:
 			x= min(self.F.items(), key= (lambda x: x[1]))[0]
 			self.P.remove(x)
+			del self.F[x]
 			self.updateF(x)
 
 
@@ -151,42 +154,41 @@ class IBEA :
 				for i in range(len(most)):
 					most[i]= f(x[i], most[i])
 		return tuple(most)
-	'''def recombination(P_,recom_rate=1.0,mu=25):
-    """The recombination operator takes a certain number of parents and creates a 
-    predefined number of children by combining parts of the parents. To mimic the 
-    stochastic nature of evolution, a crossover probability is associated with this
-    operator.
-    
-    Params:
-        P_ ---> mating pool
-        recom_rate ---> recombination rate by default is 1.0
-    """
-    recom_Pop = np.zeros((0,P_.shape[1]))
-    size_recom = P_.shape[0]*recom_rate
-    sample = np.random.randint(P_.shape[0],size=int(size_recom)) #Permutation
-    for i in range(0,sample.shape[0]-1,2):
-        #Pick two individuals to recombine to generate offspring
-        parent0 = P_[sample[i],] 
-        parent1 = P_[sample[i+1],]
-        #Step 1: Choose a random number u 2 [0; 1).
-        u = np.random.uniform(low=0.0, high=1.0)
-        #Step 2: Calculate  beta(q) using equation
-        if u <= 0.5:
-            beta_q = np.power(2*u,1/(mu+1))
-        else : 
-            beta_q = np.power(1/(2*(1-u)),1/(mu+1))
-    
-        child0 = np.zeros((1,parent0.shape[0]))
-        child1 = np.zeros((1,parent0.shape[0]))
-        #Step 3: Compute children solutions using equations for all variables
-        for j in range(parent0.shape[0]):#SBX algo to recombine cho
-            child0[0][j] = 0.5*((1+beta_q)*parent0[j]+(1-beta_q)*parent1[j])
-            child1[0][j] = 0.5*((1-beta_q)*parent0[j]+(1+beta_q)*parent1[j])
-        recom_Pop = np.append(recom_Pop, child0, axis = 0)          
-        recom_Pop = np.append(recom_Pop, child1, axis = 0)
-    P_ = np.append(P_,recom_Pop, axis = 0)     
-    return P_  
-	'''
+	def recombination(self, P_,recom_rate=1.0,mu=25):
+		"""The recombination operator takes a certain number of parents and creates a 
+		predefined number of children by combining parts of the parents. To mimic the 
+		stochastic nature of evolution, a crossover probability is associated with this
+		operator.
+		
+		Params:
+			P_ ---> mating pool
+			recom_rate ---> recombination rate by default is 1.0
+		"""
+		size_recom = len(P_)*recom_rate
+
+		sample = random.sample(P_,int(size_recom-1)) #Permutation
+		for i in range(0,int(size_recom-2),2):
+			#Pick two individuals to recombine to generate offspring
+			parent0 = sample[i]
+			parent1 = sample[i+1]
+			#Step 1: Choose a random number u 2 [0; 1).
+			u = random.random()
+			#Step 2: Calculate  beta(q) using equation
+			if u <= 0.5:
+				beta_q = math.pow(2*u,1/(mu+1))
+			else : 
+				beta_q = math.pow(1/(2*(1-u)),1/(mu+1))
+		
+			child0 = [0]* self.dim
+			child1 = [0]* self.dim 
+			#Step 3: Compute children solutions using equations for all variables
+			for j in range(self.dim):#SBX algo to recombine cho
+				child0[j] = 0.5*((1+beta_q)*parent0[j]+(1-beta_q)*parent1[j])
+				child1[j] = 0.5*((1-beta_q)*parent0[j]+(1+beta_q)*parent1[j])
+			P_.add(tuple(child0))  
+			P_.add(tuple(child1))
+		return P_  
+	
 
 
 	def generate_pop(self, pop_size, fun):
@@ -209,6 +211,7 @@ class IBEA :
 			self.addaptive_fit()
 			self.environemental_selection()
 			mat = self.mating_selection()
+			mat= self.recombination(mat)
 			self.variation(mat)
 			self.cur_gen+=1
 
@@ -217,10 +220,15 @@ class IBEA :
 
 
 def I_epsilon(A, B):#gerer les positifs négatifs
-	return np.max(A-B)
+	m=-100
+	for i in range(len(A)):
+		c= A[i]-B[i]
+		if m < c:
+			m=c
+	return m
 
-import cProfile, pstats, io
-from pstats import SortKey
+#import cProfile, pstats
+#from pstats import SortKey
 
 def myIBEA(fun, pop_size, num_max_gen, fit_scale_fact):
 	ibea = IBEA(pop_size, fun.dimension, num_max_gen, fit_scale_fact, fun, I_epsilon)
