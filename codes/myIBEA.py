@@ -23,7 +23,7 @@ def myIBEA(fun, pop_size, num_max_gen, fit_scale_fact):
     #pr = cProfile.Profile()
     #pr.enable()
     ibea.run()
-    pr.disable()
+    #pr.disable()
     #sortby = SortKey.CUMULATIVE
     #ps = pstats.Stats(pr).sort_stats(sortby)
     #ps.print_stats()

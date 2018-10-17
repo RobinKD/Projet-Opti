@@ -15,6 +15,7 @@ class IBEA :
 		self.alpha  = alpha 
 		self.gen = gen# nbde génération max
 		self.dim = dim
+		self.outdim = objective.number_of_objectives
 		self.fitval = fit 
 		self.cfit =0
 		self.I = indic
@@ -35,8 +36,10 @@ class IBEA :
 		#self.F.clear()
 		#vI= (lambda x: np.vectorize(self.cur_indic)(np.array(list(self.P)),x))
 		scale = self.fitval*self.cfit
+		if scale == 0:
+			print("div par zero")
 		for x in self.P:
-			self.F[x]= -np.sum(1/np.exp((list(self.cur_indic[x].values()))/scale))+1
+			self.F[x]=-np.sum(np.exp(np.array((list(self.cur_indic[x].values())))/scale))+1
 
 	def addaptive_fit(self):
 		"""
@@ -54,10 +57,9 @@ class IBEA :
 		
 		mi = np.min(fx,axis= 0)
 		ma = np.max(fx,axis= 0)
-
 		self.cur_objective.clear()
 		for x in self.P:
-			self.cur_objective[x]= self.static_objective[x]*(ma-mi)-mi
+			self.cur_objective[x]= (self.static_objective[x]-mi)/(ma-mi)
 		#self.cur_indic= (lambda a,b :self.I(self.cur_objective, a,b))
 
 		self.cur_indic.clear()
@@ -67,9 +69,12 @@ class IBEA :
 		for x, obx in self.cur_objective.items():#la partie la plus lente (encore a cause de I_epsilon)
 			self.cur_indic[x]= dict()
 			for y, oby in self.cur_objective.items():
-				cur= self.I(oby, obx, self.dim)
+				cur = -self.I(oby, obx)
 				self.cur_indic[x][y]= cur#on inverse x y pour avoir une opti dans fit
-				self.cfit+=cur
+				self.cfit=max(self.cfit, abs(cur))
+				#print(self.static_objective[x], self.static_objective[y])
+		#print(self.cfit)
+
 		self.fit()
 		return 
 
@@ -94,7 +99,7 @@ class IBEA :
 		"""
 		scale = self.fitval*self.cfit
 		for y in self.P:
-			self.F[y]+= np.exp(-self.cur_indic[y][el]/(scale))+1
+			self.F[y]+= math.exp(self.cur_indic[y][el]/(scale))
 
 
 	def terminaison(self): 
@@ -112,10 +117,8 @@ class IBEA :
 		Params:
 			P ---> pool of the population
 		"""
-
 		P_ = set()
 		i=0
-		#l= len(self.P)
 		for i in range(len(self.P)): #We want to have the same size as the original population FAUX
 			a,b =random.sample(self.P, 2)
 			P_.add(max(a,b, key= (lambda x : self.F[x]))) #argmax{F[x], F[y]}
@@ -125,7 +128,7 @@ class IBEA :
 
 	
 
-	def variation(self, P_,mut_rate=0.01,mu=25):
+	def variation(self, P_,mut_rate=0.05,mu=1):
 		"""the mutation operator modifies individuals by changing small 
 		parts in the associated vectors according to a given mutation rate.
 		
@@ -147,24 +150,26 @@ class IBEA :
 				#Step 3: the mutated solution p_mut for a particular variable j is created
 				if u <= 0.5:
 					sigma_L = math.pow(2*u,1/(mu+1))-1
-					pMut[j] += +sigma_L*(ind[j]-Lowers[j])
+					pMut[j] += sigma_L*(ind[j]-Lowers[j])
 				else:
 					sigma_R = 1 - math.pow(2*(1-u),1/(mu+1))
 					pMut[j] += sigma_R*(Uppers[j]-ind[j])
 			self.P.add(tuple(pMut)) #np.append(P_,pMut, axis = 0)
-	
+		self.P.update(P_)
+
+
 	def most_vect(self,P,f):
 		if len(P)!=0:
 			most  = list(P.pop())#random
 			P.add(tuple(most))
 			for x in P:
 				i=0
-				for  i in range(self.dim) :#for i in range(len(most)):
+				for i in range(self.dim) :#for i in range(len(most)):
 					most[i]= f(x[i], most[i])
 					i+=1
 		return tuple(most)
 
-	def recombination(self, P_,recom_rate=1.0,mu=25):
+	def recombination(self, P_,recom_rate=1.0,mu=1):
 		"""The recombination operator takes a certain number of parents and creates a 
 		predefined number of children by combining parts of the parents. To mimic the 
 		stochastic nature of evolution, a crossover probability is associated with this
@@ -176,8 +181,8 @@ class IBEA :
 		"""
 		size_recom = len(P_)*recom_rate
 
-		sample = random.sample(P_,int(size_recom-1)) #Permutation
-		for i in range(0,int(size_recom-2),2):
+		sample = random.sample(P_,int(size_recom)) #Permutation
+		for i in range(0,len(sample)-1,2):
 			#Pick two individuals to recombine to generate offspring
 			parent0 = sample[i]
 			parent1 = sample[i+1]
@@ -188,7 +193,6 @@ class IBEA :
 				beta_q = math.pow(2*u,1/(mu+1))
 			else : 
 				beta_q = math.pow(1/(2*(1-u)),1/(mu+1))
-		
 			child0 = [0]* self.dim
 			child1 = [0]* self.dim 
 			#Step 3: Compute children solutions using equations for all variables
@@ -228,8 +232,7 @@ class IBEA :
 
 
 
-
-def I_epsilon(A, B,l):#gerer les positifs négatifs
+def I_epsilon(l, A, B):#gerer les positifs négatifs
 	m=-100
 	i=0
 	while i < l:
@@ -238,17 +241,28 @@ def I_epsilon(A, B,l):#gerer les positifs négatifs
 			m=c
 		i+=1
 	return m
+def bin_epsilon(A, B):#gerer les positifs négatifs
+	x= A[0]-B[0]
+	y= A[1]-B[1]
+	if x >y:
+		return x
+	else :
+		return y
 
-
-#import cProfile, pstats
-#from pstats import SortKey
+import cProfile, pstats
+from pstats import SortKey
 
 def myIBEA(fun, pop_size, num_max_gen, fit_scale_fact):
 	ibea = IBEA(pop_size, fun.dimension, num_max_gen, fit_scale_fact, fun, I_epsilon)
-	#pr = cProfile.Profile()
-	#pr.enable()
+	if fun.number_of_objectives == 2:
+		I_eps = bin_epsilon
+	else:
+		I_eps =(lambda x,y : I_epsilon(fun.number_of_objectives, x,y))
+	ibea = IBEA(pop_size, fun.dimension, num_max_gen, fit_scale_fact, fun, I_eps)
+	pr = cProfile.Profile()
+	pr.enable()
 	ibea.run()
-	#pr.disable()
-	#sortby = SortKey.CUMULATIVE
-	#ps = pstats.Stats(pr).sort_stats(sortby)
-	#ps.print_stats()
+	pr.disable()
+	sortby = SortKey.CUMULATIVE
+	ps = pstats.Stats(pr).sort_stats(sortby)
+	ps.print_stats()
