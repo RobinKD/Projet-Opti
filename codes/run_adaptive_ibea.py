@@ -60,8 +60,9 @@ from cocoex.utilities import ObserverOptions, ShortInfo, ascetime, print_flush
 from cocoex.solvers import random_search
 
 import IBEA
-size_pop = 200
-nb_max_gen = 100
+import myIBEA
+size_pop = 50
+nb_max_gen = 50
 scale_factor = 0.05
 
 def default_observer_options(budget_=None, suite_name_=None, current_batch_=None):
@@ -221,7 +222,7 @@ current_batch = 1      # 1..number_of_batches
 # By default we call SOLVER(fun, x0), but the INTERFACE CAN BE ADAPTED TO EACH SOLVER ABOVE
 # SOLVER = random_search
 # SOLVER = optimize.fmin_cobyla
-SOLVER = IBEA.myIBEA # SOLVER = fmin_slsqp # SOLVER = cma.fmin
+SOLVER = myIBEA.myIBEA # SOLVER = fmin_slsqp # SOLVER = cma.fmin
 suite_instance = "" # "year:2016"
 suite_options = "dimensions: 2,3,5"  # "dimensions: 2,3,5,10,20 "  # if 40 is not desired
 # for more suite options, see http://numbbo.github.io/coco-doc/C/#suite-parameters
