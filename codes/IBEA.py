@@ -36,7 +36,7 @@ class IBEA :
 		#vI= (lambda x: np.vectorize(self.cur_indic)(np.array(list(self.P)),x))
 		scale = self.fitval*self.cfit
 		for x in self.P:
-			self.F[x]= -np.sum(np.exp(np.array([-self.cur_indic[(y,x)] for y in self.P])/scale))+1
+			self.F[x]= -np.sum(1/np.exp((list(self.cur_indic[x].values()))/scale))+1
 
 	def addaptive_fit(self):
 		"""
@@ -51,6 +51,7 @@ class IBEA :
 			if x not in self.static_objective:
 				self.static_objective[x]= self.objective(x)
 		fx= list(self.static_objective.values())
+		
 		mi = np.min(fx,axis= 0)
 		ma = np.max(fx,axis= 0)
 
@@ -62,10 +63,12 @@ class IBEA :
 		self.cur_indic.clear()
 		self.cfit= 0
 
-		for x, obx in self.cur_objective.items():
+
+		for x, obx in self.cur_objective.items():#la partie la plus lente (encore a cause de I_epsilon)
+			self.cur_indic[x]= dict()
 			for y, oby in self.cur_objective.items():
-				cur= self.I(obx, oby)
-				self.cur_indic[(x,y)]= cur
+				cur= self.I(oby, obx, self.dim)
+				self.cur_indic[x][y]= cur#on inverse x y pour avoir une opti dans fit
 				self.cfit+=cur
 		self.fit()
 		return 
@@ -75,9 +78,11 @@ class IBEA :
 		"""
 			step 3
 		"""
-		while len(self.P) > self.alpha:
+		l=len(self.P)
+		while l > self.alpha:
 			x= min(self.F.items(), key= (lambda x: x[1]))[0]
 			self.P.remove(x)
+			l-=1
 			del self.F[x]
 			self.updateF(x)
 
@@ -89,7 +94,7 @@ class IBEA :
 		"""
 		scale = self.fitval*self.cfit
 		for y in self.P:
-			self.F[y]+= np.exp(-self.cur_indic[(el,y)]/(scale))+1
+			self.F[y]+= np.exp(-self.cur_indic[y][el]/(scale))+1
 
 
 	def terminaison(self): 
@@ -109,10 +114,12 @@ class IBEA :
 		"""
 
 		P_ = set()
+		i=0
+		#l= len(self.P)
 		for i in range(len(self.P)): #We want to have the same size as the original population FAUX
 			a,b =random.sample(self.P, 2)
-
 			P_.add(max(a,b, key= (lambda x : self.F[x]))) #argmax{F[x], F[y]}
+			i+=1
 		return P_ 
 
 
@@ -148,12 +155,15 @@ class IBEA :
 	
 	def most_vect(self,P,f):
 		if len(P)!=0:
-			most  = list(P.pop())
+			most  = list(P.pop())#random
 			P.add(tuple(most))
 			for x in P:
-				for i in range(len(most)):
+				i=0
+				for  i in range(self.dim) :#for i in range(len(most)):
 					most[i]= f(x[i], most[i])
+					i+=1
 		return tuple(most)
+
 	def recombination(self, P_,recom_rate=1.0,mu=25):
 		"""The recombination operator takes a certain number of parents and creates a 
 		predefined number of children by combining parts of the parents. To mimic the 
@@ -219,13 +229,16 @@ class IBEA :
 
 
 
-def I_epsilon(A, B):#gerer les positifs négatifs
+def I_epsilon(A, B,l):#gerer les positifs négatifs
 	m=-100
-	for i in range(len(A)):
+	i=0
+	while i < l:
 		c= A[i]-B[i]
 		if m < c:
 			m=c
+		i+=1
 	return m
+
 
 #import cProfile, pstats
 #from pstats import SortKey
