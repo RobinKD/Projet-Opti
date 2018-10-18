@@ -36,6 +36,7 @@ class IBEA :
 		#self.F.clear()
 		#vI= (lambda x: np.vectorize(self.cur_indic)(np.array(list(self.P)),x))
 		scale = self.fitval*self.cfit
+		print(self.cfit)
 		if scale == 0:
 			print("div par zero")
 		for x in self.P:
@@ -128,7 +129,7 @@ class IBEA :
 
 	
 
-	def variation(self, P_,mut_rate=0.05,mu=1):
+	def variation(self, P_,mut_rate=0.05,mu=2.5):
 		"""the mutation operator modifies individuals by changing small 
 		parts in the associated vectors according to a given mutation rate.
 		
@@ -169,7 +170,7 @@ class IBEA :
 					i+=1
 		return tuple(most)
 
-	def recombination(self, P_,recom_rate=1.0,mu=1):
+	def recombination(self, P_,recom_rate=1.0,mu=2.5):
 		"""The recombination operator takes a certain number of parents and creates a 
 		predefined number of children by combining parts of the parents. To mimic the 
 		stochastic nature of evolution, a crossover probability is associated with this
@@ -249,8 +250,8 @@ def bin_epsilon(A, B):#gerer les positifs négatifs
 	else :
 		return y
 
-import cProfile, pstats
-from pstats import SortKey
+#import cProfile, pstats
+#from pstats import SortKey
 
 def myIBEA(fun, pop_size, num_max_gen, fit_scale_fact):
 	ibea = IBEA(pop_size, fun.dimension, num_max_gen, fit_scale_fact, fun, I_epsilon)
@@ -259,10 +260,10 @@ def myIBEA(fun, pop_size, num_max_gen, fit_scale_fact):
 	else:
 		I_eps =(lambda x,y : I_epsilon(fun.number_of_objectives, x,y))
 	ibea = IBEA(pop_size, fun.dimension, num_max_gen, fit_scale_fact, fun, I_eps)
-	pr = cProfile.Profile()
-	pr.enable()
+	#pr = cProfile.Profile()
+	#pr.enable()
 	ibea.run()
-	pr.disable()
-	sortby = SortKey.CUMULATIVE
-	ps = pstats.Stats(pr).sort_stats(sortby)
-	ps.print_stats()
+	#pr.disable()
+	#sortby = SortKey.CUMULATIVE
+	#ps = pstats.Stats(pr).sort_stats(sortby)
+	#ps.print_stats()
