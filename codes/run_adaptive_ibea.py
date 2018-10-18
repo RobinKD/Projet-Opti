@@ -224,7 +224,7 @@ current_batch = 1      # 1..number_of_batches
 # SOLVER = optimize.fmin_cobyla
 SOLVER = myIBEA.myIBEA # SOLVER = fmin_slsqp # SOLVER = cma.fmin
 suite_instance = "" # "year:2016"
-suite_options = "dimensions: 2,3,5"  # "dimensions: 2,3,5,10,20 "  # if 40 is not desired
+suite_options = "dimensions: 10"  # "dimensions: 2,3,5,10,20 "  # if 40 is not desired
 # for more suite options, see http://numbbo.github.io/coco-doc/C/#suite-parameters
 observer_options = ObserverOptions({  # is (inherited from) a dictionary
                     'algorithm_info': '"An Adaptive IBEA algorithm"', # CHANGE/INCOMMENT THIS!
@@ -256,11 +256,11 @@ def main(budget=budget,
     if number_of_batches > 1:
         print('Batch usecase, make sure you run *all* %d batches.\n' %
               number_of_batches)
-    t0 = time.clock()
+    t0 = time.perf_counter()
     batch_loop(SOLVER, suite, observer, budget, max_runs,
                current_batch, number_of_batches)
     print(", %s (%s total elapsed time)." %
-            (time.asctime(), ascetime(time.clock() - t0)))
+            (time.asctime(), ascetime(time.perf_counter() - t0)))
     print('Data written to folder', observer.result_folder)
     print('To post-process the data call \n'
           '    python -m cocopp %s \n'
