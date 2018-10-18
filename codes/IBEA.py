@@ -36,7 +36,7 @@ class IBEA :
 		#self.F.clear()
 		#vI= (lambda x: np.vectorize(self.cur_indic)(np.array(list(self.P)),x))
 		scale = self.fitval*self.cfit
-		print(self.cfit)
+		#print(self.cfit)
 		if scale == 0:
 			print("div par zero")
 		for x in self.P:
@@ -118,11 +118,11 @@ class IBEA :
 		Params:
 			P ---> pool of the population
 		"""
-		P_ = set()
+		P_ = list()
 		i=0
 		for i in range(len(self.P)): #We want to have the same size as the original population FAUX
 			a,b =random.sample(self.P, 2)
-			P_.add(max(a,b, key= (lambda x : self.F[x]))) #argmax{F[x], F[y]}
+			P_.append(max(a,b, key= (lambda x : self.F[x]))) #argmax{F[x], F[y]}
 			i+=1
 		return P_ 
 
@@ -161,8 +161,7 @@ class IBEA :
 
 	def most_vect(self,P,f):
 		if len(P)!=0:
-			most  = list(P.pop())#random
-			P.add(tuple(most))
+			most  = list(P[0])
 			for x in P:
 				i=0
 				for i in range(self.dim) :#for i in range(len(most)):
@@ -200,8 +199,8 @@ class IBEA :
 			for j in range(self.dim):#SBX algo to recombine cho
 				child0[j] = 0.5*((1+beta_q)*parent0[j]+(1-beta_q)*parent1[j])
 				child1[j] = 0.5*((1-beta_q)*parent0[j]+(1+beta_q)*parent1[j])
-			P_.add(tuple(child0))  
-			P_.add(tuple(child1))
+			P_.append(tuple(child0))  
+			P_.append(tuple(child1))
 		return P_  
 	
 
