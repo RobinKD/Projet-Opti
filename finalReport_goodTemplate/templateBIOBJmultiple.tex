@@ -201,15 +201,23 @@ This paper discusses the implementation of a multiobjective evolutionary algorit
 
 The adaptive IBEA we implement is dedicated to the following improvements: it requires no diversity preservation techniques within its population evolution mechanism, and it aims at taking into account arbitrary preference information.
 
-\subsection{Description of the objects associated with the algorithm}
-
-The algorithm input consists of decision space vectors $x^i \in X$, an objective space $Z$ and objective functions $f^j : X \rightarrow Z$.
+% binary v unary indicator !
 
 \section{Description of algorithm}
 
-The output of a MOEA is a set of incomparable decision vector, meaning that no member of the output set dominates another one. Domination between decision vectors is defined as follows:
+\subsection{Description of the objects associated with the algorithm}
+
+The algorithm input consists of decision space vectors $x^i \in X$, an objective space $Z$ and objective functions $f^j : X \rightarrow Z$. We suppose that $X \subseteq \mathbb{R}^l$ with $l \in \{2,3,5,10,20,40\}$ and $Z \subseteq \mathbb{R}^2$. 
+
+The output of a MOEA is a set of incomparable decision vector, meaning that no member of the output set dominates another one. Domination between decision vectors is defined as follows: a decision vector $x^1$ is said to dominate another decision vector $x^2$ ($ x^1 \succ x^2$), if $f_i (x^1) \leq f_i(x^2) \forall i \in \{1,...,n\}$ and $\exists j \in \{1,...n\}$ for which $f_j(x^1) < f_j(x^2)$.
+
+This output will be our Pareto set approximation, and the space of Pareto set approximations will be noted as $\Omega$. Our algorithm relies on a binary quality indicator $I: \Omega \times \Omega \rightarrow \mathbb{R}$ which associates a real number to $k$ Pareto set approximations.
+
+Our binary quality indicator is defined as the minimum distance by which a Pareto set approximation needs to be translated in each dimension
 
 \subsection{Description of the algorithm adaptive IBEA}
+
+The algorithm steps is described in pseudo-code ~\ref{alg:ALG1}. The adaptive version of IBEA answers the potential issue of widely spread binary quality indicators values. Too spread out indicators values complicate the task of determining a correct value for $K$. By adaptivaly scaling the binary quality indicators values back to a common $[-1;1]$ interval, we substantially suppress the need to adapt $K$ to our different problems.
 
 \begin{algorithm}%[H]
         \caption{Adaptive IBEA}
@@ -276,11 +284,33 @@ The output of a MOEA is a set of incomparable decision vector, meaning that no m
 
 IBEA can be faster than other algorithms since it only compares pair of decision vectors rather than complete approximation sets.
 
-\subsection{Additional details regarding mutation}
-
+\subsection{Details regarding mutation}
 % https://www.iitk.ac.in/kangal/papers/k2012016.pdf
 
-\subsection{Additional details regarding recombination}
+The mutation operator modifies individuals by changing small parts in the associated vectors according to a given mutation rate. The mutation rate determines how much of the considered population we will use to generate new decision space vectors. This process reminds how related evolutionary algorithms seem related to biological evolution, mimicking natural hereditary relationships.
+
+The operations involved in one single mutation are as follows. A random individual is picked from the population $P$. According to a uniform probability pick, the mutation is realized using one mathematical transformation applied to its coordinates in the decision space. Note that the transformation change from one coordinate to another, since the uniform probability pick is repeated for each. In our case, there are two forms of transformations on coordinates. In the following equations, $u$ is uniformly picked in $[0,1]$, $ind[j]$ the $j-th$ coordinate of the already existing picked individual, $p_{mut}[j]$ the $j-th$ coordinate of the newly generated individual, $Up$ the biggest existing coordinate value, $Lo$ the lowest. The two latters are each defined for each decision space dimension.
+
+\begin{itemize}
+\item if the uniform probability pick $\leq 0.5$:
+\begin{equation}
+\sigma_L = 2u^{\frac{1}{\mu +1}}-1 
+\end{equation}
+\begin{equation}
+p_{mut}[j] = ind[j] + \sigma_L(ind[j]-Lo)
+\end{equation}
+\item else:
+\begin{equation}
+\sigma_R = 2(1-u)^{\frac{1}{\mu +1}} 
+\end{equation}
+\begin{equation}
+p_{mut}[j] = ind[j] + \sigma_R(Up-ind[j])
+\end{equation}
+\end{itemize}
+
+This is implemented thanks to a loop on individuals, with a nested loop treating each decision space dimension coordinate.
+
+\subsection{Details regarding recombination}
 
 \section{Description of implementation}
 

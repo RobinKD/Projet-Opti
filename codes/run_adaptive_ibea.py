@@ -223,7 +223,7 @@ current_batch = 1      # 1..number_of_batches
 # SOLVER = optimize.fmin_cobyla
 SOLVER = myIBEA.myIBEA # SOLVER = fmin_slsqp # SOLVER = cma.fmin
 suite_instance = "" # "year:2016"
-suite_options = "dimensions: 2,3,5"  # "dimensions: 2,3,5,10,20 "  # if 40 is not desired
+suite_options = "dimensions: 2,3,5,10"  # "dimensions: 2,3,5,10,20 "  # if 40 is not desired
 # for more suite options, see http://numbbo.github.io/coco-doc/C/#suite-parameters
 observer_options = ObserverOptions({  # is (inherited from) a dictionary
                     'algorithm_info': '"An Adaptive IBEA algorithm"', # CHANGE/INCOMMENT THIS!
