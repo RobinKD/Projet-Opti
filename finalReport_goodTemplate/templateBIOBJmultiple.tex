@@ -11,6 +11,8 @@
 \usepackage{wasysym} % Table legend with symbols input from post-processing
 \usepackage{MnSymbol} % Table legend with symbols input from post-processing
 \usepackage{ifthen}
+\usepackage{diagbox}
+\usepackage{url}
 
 \settopmatter{printacmref=false}
 \usepackage{amsmath}
@@ -398,7 +400,46 @@ unsuccessful trial under consideration.
 \subsection{Results of our algorithm}
 
 \subsection{Comparison with NSGA 2 and Random Search}
+NSGA-II is a very famous multi-objective optimization algorithm. It has three special characteristics: fast non-dominated sorting approach, fast crowded distance estimation procedure and simple crowded comparison operator. And it has been used successfully in lots of multi-objective optimization problems. I take the data obtained by NSGA-II algorithm from the following link: \\ \url{http://coco.gforge.inria.fr/data-archive/bbob-biobj/2016/NSGA-II-MATLAB_Auger_bbob-biobj.tgz} \\
+\\
+Here is the result of the NSGA-II algorithm: \\
+% ici image pprldmany de NSGA-II
+The basic idea of the Random search algorithm is to randomly select some points according to certain criteria, then put these points into the functions, and keep the best points from them for the next iteration. It is essentially a violent search mechanism, but when the number of evalutions is greatly increased, it can also achieve good results. I take the data obtained by Random search algorithm from the following link: \\
+\url{http://coco.gforge.inria.fr/data-archive/bbob-biobj/2016/RANDOMSEARCH-5_Auger_bbob-biobj.tgz} \\
+Here is the result of the Random search algorithm: \\
+% ici image pprldmany de Randomsearch
+\begin{table}[!htbp]
+%\centering
+\caption{Comparison of three algorithms}
 
+\begin{tabular}{|p{3cm}|p{2.6cm}|p{2cm}|}
+\hline
+\diagbox{Algorithm}{Category}&Log10(f-evals/ dimension)&Best for 2-D\\
+\hline
+Random search&6&0,62\\
+\hline
+NSGA-II&4,4&0,76\\
+\hline
+IBEA& 2,4(40D)-3,6(2D)&0,58\\
+\hline
+\end{tabular}
+\begin{tabular}{|p{2.4cm}|p{2.6cm}|p{2.6cm}|}
+\hline
+Best for 40-D&Best evaluated function&Worst evaluated function\\
+\hline
+0,08&f13, f53&f37, f46\\
+\hline
+0,17&f19, f53&f22\\
+\hline
+0,12&f18, f53&f31, f47\\
+\hline
+\end{tabular}
+\end{table}
+
+
+From the above table we can see that, in general, NSGA-II is the best algorithm, its evaluation is not too big, but it can get the best results. IEBA is also a good algorithm, it does not need too many evaluations, but it can also get good results. And according to the estimation of COCO, its best value can exceed Random search (if the algorithm does more evaluations). In contrast, the effect of Random search is not very good, it need too many evaluations to get a good value, and when the dimension of input becomes higher, the algorithm is not so effective. From the last two columns of the table, we can see that different algorithms have different optimization capabilities for each function, and f53 is friendly to all the algorithms.
+
+%Maybe add the others images of NSGA-II and Randome search in the appendix
 \section{Conclusion}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
