@@ -199,9 +199,15 @@ This paper discusses the implementation of a multiobjective evolutionary algorit
 
 \section{Introduction}
 
-The adaptive IBEA we implement is dedicated to the following improvements: it requires no diversity preservation techniques within its population evolution mechanism, and it aims at taking into account arbitrary preference information.
+The adaptive IBEA we implement is dedicated to the following improvements: it requires no diversity preservation techniques within its population evolution mechanism, and it aims at taking into account arbitrary preference information thanks to its $\epsilon$ additive binary quality indicators. It operates on a set of candidates in a decision space, which will be modified thanks to selection and variation mechanisms. 
 
-% binary v unary indicator !
+The parallel with evolution can be reminded here: selection in our algorithm could be associated with the competition for reproduction and resources in nature, while variation illustrates the ability of existing living creatures to create new living beings thanks to genetic recombination and mutation. Note that due to the randomness of the variation process some individuals may not be transformed in the evolutionary mechanism.
+
+Since we are in the case of multiobjective optimization, it is possible that several optimal objective vectors co-exist: they would be trade-offs between the different objectives we are pursuing. As we will discover in the algorithm description, our IBEA could, as any general stochastic search algorithm, be divided into three main elements: a working memory (the population of decision space candidates), a selection module, and a variation module. Among the differences with single-objective optimization, the working memory can here consider several solutions at a time. In single-objective optimizatin no mating selection is required and variation translates into modifying the current solution candidate.
+
+\subsection{Why binary quality indicators ?}
+
+Unary quality measures have been proved to be theoretically limited: they do not allow to determine whether a Pareto set approximation is better than another one. This limitation is still valid for a finite combinatio of unary quality measures. Binary quality indicators overcome part of the limitations and can, for certain binary indicators, indicate whether a Pareto approximation set is better than another one. \cite{IBEA_tutorial}
 
 \section{Description of algorithm}
 
@@ -213,11 +219,15 @@ The output of a MOEA is a set of incomparable decision vector, meaning that no m
 
 This output will be our Pareto set approximation, and the space of Pareto set approximations will be noted as $\Omega$. Our algorithm relies on a binary quality indicator $I: \Omega \times \Omega \rightarrow \mathbb{R}$ which associates a real number to $k$ Pareto set approximations.
 
-Our binary quality indicator is defined as the minimum distance by which a Pareto set approximation needs to be translated in each dimension
+Our binary quality indicator is defined as the minimum distance by which a Pareto set approximation needs to be translated in each dimension in objective space so that another approximation (image of a decision space vector) is weakly dominated. The weak domination is defined as follows: decision vector $x^1$ weakly dominates $x^2$, written $x^1 \succeq x^2$, if $x^1$ dominates $x^2$ or the corresponding objective vectors are equal \cite{IBEA_base}. The mathematical translation of this definition consists in the following equation:
+
+\begin{equation}
+I_{\epsilon^+ (A,B)} = min_{\epsilon} \{\forall x^2 \in B\ \exists x^1 \in A : f_i(x^1) - \epsilon \leq f_i (x^2) for\ i \in \{1,...,n\}\}
+\end{equation}
 
 \subsection{Description of the algorithm adaptive IBEA}
 
-The algorithm steps is described in pseudo-code ~\ref{alg:ALG1}. The adaptive version of IBEA answers the potential issue of widely spread binary quality indicators values. Too spread out indicators values complicate the task of determining a correct value for $K$. By adaptivaly scaling the binary quality indicators values back to a common $[-1;1]$ interval, we substantially suppress the need to adapt $K$ to our different problems.
+The algorithm steps is described in pseudo-code ~\ref{alg:ALG1}. The adaptive version of IBEA answers the potential issue of widely spread binary quality indicators values. Too spread out indicators values complicate the task of determining a correct value for $K$, the scaling factor associated with our indicator. By adaptivaly scaling the binary quality indicators values back to a common $[-1;1]$ interval, we substantially suppress the need to adapt $K$ to our different problems.
 
 \begin{algorithm}%[H]
         \caption{Adaptive IBEA}
@@ -284,33 +294,67 @@ The algorithm steps is described in pseudo-code ~\ref{alg:ALG1}. The adaptive ve
 
 IBEA can be faster than other algorithms since it only compares pair of decision vectors rather than complete approximation sets.
 
-\subsection{Details regarding mutation}
-% https://www.iitk.ac.in/kangal/papers/k2012016.pdf
+\subsection{Details regarding mating selection}
 
-The mutation operator modifies individuals by changing small parts in the associated vectors according to a given mutation rate. The mutation rate determines how much of the considered population we will use to generate new decision space vectors. This process reminds how related evolutionary algorithms seem related to biological evolution, mimicking natural hereditary relationships.
+Mating selection aims at picking promising solutions for variation and usually is performed in a randomized fashion. Perform binary tournament selection with replacement on $P$ in order to fill a temporary mating pool (the variable $P\_$ in our implementation). The binary tournament consists in keeping the candidate with the best fitness value from the random pick.
+
+\subsection{Details regarding mutation}
+
+The mutation operator modifies individuals by changing small parts in the associated vectors according to a given mutation rate. The mutation rate determines how much of the considered population we will use to generate new decision space vectors. This process reminds how related evolutionary algorithms seem related to biological evolution, mimicking natural hereditary relationships. For mutation we use a polynomial mutation operator.
 
 The operations involved in one single mutation are as follows. A random individual is picked from the population $P$. According to a uniform probability pick, the mutation is realized using one mathematical transformation applied to its coordinates in the decision space. Note that the transformation change from one coordinate to another, since the uniform probability pick is repeated for each. In our case, there are two forms of transformations on coordinates. In the following equations, $u$ is uniformly picked in $[0,1]$, $ind[j]$ the $j-th$ coordinate of the already existing picked individual, $p_{mut}[j]$ the $j-th$ coordinate of the newly generated individual, $Up$ the biggest existing coordinate value, $Lo$ the lowest. The two latters are each defined for each decision space dimension.
 
 \begin{itemize}
 \item if the uniform probability pick $\leq 0.5$:
 \begin{equation}
-\sigma_L = 2u^{\frac{1}{\mu +1}}-1 
+\sigma_L = (2u)^{\frac{1}{\mu +1}}-1 
 \end{equation}
 \begin{equation}
 p_{mut}[j] = ind[j] + \sigma_L(ind[j]-Lo)
 \end{equation}
 \item else:
 \begin{equation}
-\sigma_R = 2(1-u)^{\frac{1}{\mu +1}} 
+\sigma_R = (2(1-u))^{\frac{1}{\mu +1}} 
 \end{equation}
 \begin{equation}
 p_{mut}[j] = ind[j] + \sigma_R(Up-ind[j])
 \end{equation}
 \end{itemize}
 
-This is implemented thanks to a loop on individuals, with a nested loop treating each decision space dimension coordinate.
+This is implemented thanks to a loop on individuals, with a nested loop treating each decision space dimension coordinate. Mathematical formulas involving hyperparameters are based on \cite{compute_sigma}.
+
+% https://www.iitk.ac.in/kangal/papers/k2012016.pdf
 
 \subsection{Details regarding recombination}
+
+The recombination operator takes a certain number of parents and creates a predefined number of children by combining parts of the parents. For recombination we use a simulated binary crossover (SBX) operator. To mimic the stochastic nature of evolution, a crossover probability is associated with this operator. In our case, two parents are selected among the current population. A uniform probability pick in $[0,1]$ written $u$ determines the parameter used in computing the features (decision space coordinates) of the children. In the following equations, $child0-1[j]$ is the $j-th$ coordinate of the generated child decision vector, $parent0-1[j]$ the $j-th$ coordinate of the parent associated with the child.
+
+\begin{itemize}
+\item if the uniform probability pick $\leq 0.5$:
+\begin{equation}
+\beta_q = (2u)^{\frac{1}{\mu +1}}
+\end{equation}
+\item else:
+\begin{equation}
+\beta_q = (\frac{1}{2(1-u)})^{\frac{1}{\mu +1}}
+\end{equation}
+\end{itemize}
+
+Thanks to this stochastic parameter we can compute the children's coordinates:
+
+\begin{itemize}
+\item first child:
+\begin{equation}
+child0[j] = 0.5((1+\beta_q)parent0[j]+(1-\beta_q)parent1[j])
+\end{equation}
+\item second child:
+\begin{equation}
+child1[j] = 0.5((1-\beta_q)parent0[j]+(1+\beta_q)parent1[j])
+\end{equation}
+\end{itemize}
+
+Regarding the hyperparameter $\mu$, formulas were taken from \cite{compute_mu}. In the article this parameter is referred to as $\eta_c$. A large $\eta_c$ implies an offspring close to the parents in coordinates. For a smaller $\eta_c$, children solutions tend to differ more from their parents. This parameter is therefore essential to controlling the spread of the offspring.
+% http://www.cs.bham.ac.uk/~wbl/biblio/gecco2007/docs/p1187.pdf
 
 \section{Description of implementation}
 
