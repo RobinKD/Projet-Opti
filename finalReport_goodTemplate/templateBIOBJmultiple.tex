@@ -202,7 +202,8 @@ This paper discusses the implementation of a multiobjective evolutionary algorit
 %\terms{Algorithms}
 
 % Complete with anything that is needed
-\keywords{Evolutionary algorithm, Benchmarking, Black-box optimization, Bi-objective optimization, Decision Vector}
+\keywords{Evolutionary algorithm, Benchmarking, Black-box optimization,
+  Bi-objective optimization, Decision Vector, Pareto-Set approximation}
 
 \maketitle
 
@@ -221,7 +222,7 @@ description, our IBEA could, as any general stochastic search algorithm, be
 divided into three main elements: a working memory (the population of decision
 space candidates), a selection module, and a variation module. Among the
 differences with single-objective optimization, the working memory can here
-consider several solutions at a time. In single-objective optimizatin no mating
+consider several solutions at the same time. In single-objective optimizatin no mating
 selection is required and variation translates into modifying the current
 solution candidate.
 
@@ -242,7 +243,8 @@ another decision vector $x^2$, written $ x^1 \succ x^2$, if $f_i (x^1) \leq f_i(
 
 This output will be our Pareto set approximation, and the space of Pareto set approximations will be noted as $\Omega$. Our algorithm relies on a binary quality indicator $I: \Omega \times \Omega \rightarrow \mathbb{R}$ which associates a real number to $k$ Pareto set approximations.
 
-Our binary quality indicator is defined as the minimum distance by which a Pareto set approximation needs to be translated in each dimension in objective space so that another approximation (image of a decision space vector) is weakly dominated. The weak domination is defined as follows: decision vector $x^1$ weakly dominates $x^2$, written $x^1 \succeq x^2$, if $x^1$ dominates $x^2$ or the corresponding objective vectors are equal \cite{IBEA_base}. The mathematical translation of this definition consists in the following equation:
+Our binary quality indicator is defined as the minimum distance by which a
+Pareto set approximation needs to be translated in each dimension in the objective space so that another approximation (image of a decision space vector) is weakly dominated. The weak domination is defined as follows: decision vector $x^1$ weakly dominates $x^2$, written $x^1 \succeq x^2$, if $x^1$ dominates $x^2$ or the corresponding objective vectors are equal \cite{IBEA_base}. The mathematical translation of this definition consists in the following equation:
 
 \begin{equation}
 I_{\epsilon^+ (A,B)} = min_{\epsilon} \{\forall x^2 \in B\ \exists x^1 \in A : f_i(x^1) - \epsilon \leq f_i (x^2) for\ i \in \{1,...,n\}\}
@@ -250,7 +252,7 @@ I_{\epsilon^+ (A,B)} = min_{\epsilon} \{\forall x^2 \in B\ \exists x^1 \in A : f
 
 \subsection{Description of the algorithm adaptive IBEA}
 
-The algorithm steps are described in pseudo-code ~\ref{alg:ALG1}. The adaptive version of IBEA answers the potential issue of widely spread binary quality indicators values. Too spread out indicators values complicate the task of determining a correct value for $K$, the scaling factor associated with our indicator. By adaptivaly scaling the binary quality indicators values back to a common $[-1;1]$ interval, we substantially suppress the need to adapt $K$ to our different problems.
+The algorithm steps are described in pseudo-code ~\ref{alg:ALG1}. The adaptive version of IBEA answers the potential issue of widely spread binary quality indicators values. Too spread out indicators values complicate the task of determining a correct value for $K$, the scaling factor associated with our indicator. By adaptivaly scaling the binary quality indicators' values back to a common $[-1;1]$ interval, we substantially suppress the need to adapt $K$ to our different problems.
 
 \begin{algorithm}%[H]
         \caption{Adaptive IBEA}
@@ -319,11 +321,12 @@ IBEA can be faster than other algorithms since it only compares pair of decision
 
 \subsection{Details regarding mating selection}
 
-Mating selection aims at picking promising solutions for variation and usually is performed in a randomized fashion. Perform binary tournament selection with replacement on $P$ in order to fill a temporary mating pool (the variable $P'$ in our implementation). The binary tournament consists in keeping the candidate with the best fitness value from the random pick.
+Mating selection aims at picking promising solutions for variation and usually
+is performed in a randomized fashion. It performs a binary tournament selection with replacement on $P$ in order to fill a temporary mating pool (the variable $P'$ in our implementation). The binary tournament consists in keeping the candidate with the best fitness value from the random pick.
 
 \subsection{Details regarding mutation}
 
-The mutation operator modifies individuals by changing small parts in the associated vectors according to a given mutation rate. The mutation rate determines how much of the considered population we will use to generate new decision space vectors. This process reminds how evolutionary algorithms seem related to biological evolution, mimicking natural hereditary relationships. For mutation we use a polynomial mutation operator.
+The mutation operator modifies individuals by changing small parts in the associated vectors according to a given mutation rate. The mutation rate determines how much of the considered population we will use to generate new decision space vectors. This process reminds how evolutionary algorithms seem related to biological evolution, mimicking natural hereditary relationships. For mutation, we used a polynomial mutation operator.
 
 The operations involved in one single mutation are as follows. A random individual is picked from the population $P$. According to a uniform probability pick, the mutation is realized using one mathematical transformation applied to its coordinates in the decision space. Note that the transformation changes from one coordinate to another, since the uniform probability pick is repeated for each. In our case, there are two forms of transformations on coordinates. In the following equations, $u$ is uniformly picked in $[0,1]$, $ind[j]$ the $j^{th}$ coordinate of the already existing picked individual, $p_{mut}[j]$ the $j^{th}$ coordinate of the newly generated individual, $Up$ the biggest existing coordinate value, $Lo$ the lowest. The two latters are each defined for each decision space dimension.
 
