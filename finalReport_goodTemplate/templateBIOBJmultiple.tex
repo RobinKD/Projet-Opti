@@ -29,7 +29,7 @@
 \usepackage{todonotes}
 
 % Copyright
-%\setcopyright{none}
+\setcopyright{none}
 %\setcopyright{acmcopyright}
 %\setcopyright{acmlicensed}
 %\setcopyright{rightsretained}
@@ -39,10 +39,10 @@
 %\setcopyright{cagovmixed}
 
 % DOI
-\acmDOI{None}
+\acmDOI{none}
 
 % ISBN
-\acmISBN{None}
+\acmISBN{none}
 
 %Conference
 \acmConference[]{None}{}{}
@@ -96,8 +96,12 @@
 \setcopyright{none}
 \begin{document}
 
+\settopmatter{printacmref=false} % Removes citation information below abstract
+\renewcommand\footnotetextcopyrightpermission[1]{} % removes footnote with conference information in first column
+\pagestyle{plain}
+
 \title{Black-Box Optimization Benchmarking of the \\Multiobjective Optimizer adaptive IBEA ($\epsilon$ -indicator) \\with the COCO platform}
-\renewcommand{\shorttitle}{Template to Compare Multiple Algorithms on the \bbobbiobj Testbed}
+\renewcommand{\shorttitle}{Benchmarking of Adaptive IBEA implementation \bbobbiobj Testbed}
 %\titlenote{Submission deadline: March 31st.}
 %Camera-ready paper due April 24th.}}
 %\subtitle{Draft version}
@@ -173,7 +177,7 @@
 
 
 \begin{abstract}
-This paper discusses the implementation of a multiobjective evolutionary algorithm (MOEA). We implemented the Multiobjective Optimizer IBEA (indicator-based evolutionary algorithm) with $\epsilon$-indicator \cite{IBEA_base} in Python and benchmarked it using the COCO platform\cite{hansen2016exp}. In addition, we compared the results obtained with this algorithm with those of NSGA 2 and Random Search. 
+This paper discusses the implementation of a multiobjective evolutionary algorithm (MOEA). We implemented the Multiobjective Optimizer IBEA (indicator-based evolutionary algorithm) with $\epsilon$-indicator \cite{IBEA_base} in Python and benchmarked it using the COCO platform\cite{hansen2016exp}. In addition, we compared the results obtained with this algorithm with those of NSGA-II and Random Search. 
 \end{abstract}
 
 %
@@ -206,9 +210,9 @@ This paper discusses the implementation of a multiobjective evolutionary algorit
 \section{Introduction}
 
 
-The adaptive IBEA we implement is dedicated to the following improvements: it requires no diversity preservation techniques within its population evolution mechanism, and it aims at taking into account arbitrary preference information thanks to its $\epsilon$ additive binary quality indicators. It operates on a set of candidates in a decision space, which will be modified thanks to selection and variation mechanisms. 
+The adaptive IBEA we implemented is dedicated to the following improvements: it requires no diversity preservation techniques within its population evolution mechanism, and it aims at taking into account arbitrary preference information thanks to its $\epsilon$ additive binary quality indicators. It operates on a set of candidates in a decision space, which will be modified thanks to selection and variation mechanisms. 
 
-The parallel with evolution can be reminded here: selection in our algorithm could be associated with the competition for reproduction and resources in nature, while variation illustrates the ability of existing living creatures to create new living beings thanks to genetic recombination and mutation. Note that due to the randomness of the variation process some individuals may not be transformed in the evolutionary mechanism.
+Those two last steps remind us of biological evolution: selection in our algorithm could be associated with the competition for reproduction and resources in nature, while variation illustrates the ability of existing living creatures to create new living beings thanks to genetic recombination and mutation. Note that due to the randomness of the variation process, some individuals may not be transformed in the evolutionary mechanism.
 
 Since we are in the case of multiobjective optimization, it is possible that
 several optimal objective vectors co-exist: they would be trade-offs between the
@@ -229,9 +233,12 @@ Unary quality measures have been proved to be theoretically limited: they do not
 
 \subsection{Description of the objects associated with the algorithm}
 
-The algorithm input consists of decision space vectors $x^i \in X$, an objective space $Z$ and objective functions $f^j : X \rightarrow Z$. We suppose that $X \subseteq \mathbb{R}^l$ with $l \in \{2,3,5,10,20,40\}$ and $Z \subseteq \mathbb{R}^2$. 
+The algorithm's inputs consist of decision space vectors $x^i \in X$, an objective space $Z$ and objective functions $f^j : X \rightarrow Z$. We suppose that $X \subseteq \mathbb{R}^l$ with $l \in \{2,3,5,10,20,40\}$ and $Z \subseteq \mathbb{R}^2$. 
 
-The output of a MOEA is a set of incomparable decision vector, meaning that no member of the output set dominates another one. Domination between decision vectors is defined as follows: a decision vector $x^1$ is said to dominate another decision vector $x^2$ ($ x^1 \succ x^2$), if $f_i (x^1) \leq f_i(x^2) \forall i \in \{1,...,n\}$ and $\exists j \in \{1,...n\}$ for which $f_j(x^1) < f_j(x^2)$.
+The output of a MOEA is a set of incomparable decision vector, meaning that no
+member of the output set dominates another one. Domination between decision
+vectors is defined as follows: a decision vector $x^1$ is said to dominate
+another decision vector $x^2$, written $ x^1 \succ x^2$, if $f_i (x^1) \leq f_i(x^2) \forall i \in \{1,...,n\}$ and $\exists j \in \{1,...n\}$ for which $f_j(x^1) < f_j(x^2)$.
 
 This output will be our Pareto set approximation, and the space of Pareto set approximations will be noted as $\Omega$. Our algorithm relies on a binary quality indicator $I: \Omega \times \Omega \rightarrow \mathbb{R}$ which associates a real number to $k$ Pareto set approximations.
 
@@ -243,7 +250,7 @@ I_{\epsilon^+ (A,B)} = min_{\epsilon} \{\forall x^2 \in B\ \exists x^1 \in A : f
 
 \subsection{Description of the algorithm adaptive IBEA}
 
-The algorithm steps is described in pseudo-code ~\ref{alg:ALG1}. The adaptive version of IBEA answers the potential issue of widely spread binary quality indicators values. Too spread out indicators values complicate the task of determining a correct value for $K$, the scaling factor associated with our indicator. By adaptivaly scaling the binary quality indicators values back to a common $[-1;1]$ interval, we substantially suppress the need to adapt $K$ to our different problems.
+The algorithm steps are described in pseudo-code ~\ref{alg:ALG1}. The adaptive version of IBEA answers the potential issue of widely spread binary quality indicators values. Too spread out indicators values complicate the task of determining a correct value for $K$, the scaling factor associated with our indicator. By adaptivaly scaling the binary quality indicators values back to a common $[-1;1]$ interval, we substantially suppress the need to adapt $K$ to our different problems.
 
 \begin{algorithm}%[H]
         \caption{Adaptive IBEA}
@@ -312,13 +319,13 @@ IBEA can be faster than other algorithms since it only compares pair of decision
 
 \subsection{Details regarding mating selection}
 
-Mating selection aims at picking promising solutions for variation and usually is performed in a randomized fashion. Perform binary tournament selection with replacement on $P$ in order to fill a temporary mating pool (the variable $P\_$ in our implementation). The binary tournament consists in keeping the candidate with the best fitness value from the random pick.
+Mating selection aims at picking promising solutions for variation and usually is performed in a randomized fashion. Perform binary tournament selection with replacement on $P$ in order to fill a temporary mating pool (the variable $P'$ in our implementation). The binary tournament consists in keeping the candidate with the best fitness value from the random pick.
 
 \subsection{Details regarding mutation}
 
-The mutation operator modifies individuals by changing small parts in the associated vectors according to a given mutation rate. The mutation rate determines how much of the considered population we will use to generate new decision space vectors. This process reminds how related evolutionary algorithms seem related to biological evolution, mimicking natural hereditary relationships. For mutation we use a polynomial mutation operator.
+The mutation operator modifies individuals by changing small parts in the associated vectors according to a given mutation rate. The mutation rate determines how much of the considered population we will use to generate new decision space vectors. This process reminds how evolutionary algorithms seem related to biological evolution, mimicking natural hereditary relationships. For mutation we use a polynomial mutation operator.
 
-The operations involved in one single mutation are as follows. A random individual is picked from the population $P$. According to a uniform probability pick, the mutation is realized using one mathematical transformation applied to its coordinates in the decision space. Note that the transformation change from one coordinate to another, since the uniform probability pick is repeated for each. In our case, there are two forms of transformations on coordinates. In the following equations, $u$ is uniformly picked in $[0,1]$, $ind[j]$ the $j-th$ coordinate of the already existing picked individual, $p_{mut}[j]$ the $j-th$ coordinate of the newly generated individual, $Up$ the biggest existing coordinate value, $Lo$ the lowest. The two latters are each defined for each decision space dimension.
+The operations involved in one single mutation are as follows. A random individual is picked from the population $P$. According to a uniform probability pick, the mutation is realized using one mathematical transformation applied to its coordinates in the decision space. Note that the transformation changes from one coordinate to another, since the uniform probability pick is repeated for each. In our case, there are two forms of transformations on coordinates. In the following equations, $u$ is uniformly picked in $[0,1]$, $ind[j]$ the $j^{th}$ coordinate of the already existing picked individual, $p_{mut}[j]$ the $j^{th}$ coordinate of the newly generated individual, $Up$ the biggest existing coordinate value, $Lo$ the lowest. The two latters are each defined for each decision space dimension.
 
 \begin{itemize}
 \item if the uniform probability pick $\leq 0.5$:
@@ -343,7 +350,7 @@ This is implemented thanks to a loop on individuals, with a nested loop treating
 
 \subsection{Details regarding recombination}
 
-The recombination operator takes a certain number of parents and creates a predefined number of children by combining parts of the parents. For recombination we use a simulated binary crossover (SBX) operator. To mimic the stochastic nature of evolution, a crossover probability is associated with this operator. In our case, two parents are selected among the current population. A uniform probability pick in $[0,1]$ written $u$ determines the parameter used in computing the features (decision space coordinates) of the children. In the following equations, $child0-1[j]$ is the $j-th$ coordinate of the generated child decision vector, $parent0-1[j]$ the $j-th$ coordinate of the parent associated with the child.
+The recombination operator takes a certain number of parents and creates a predefined number of children by combining parts of the parents. For recombination, we use a simulated binary crossover (SBX) operator. To mimic the stochastic nature of evolution, a crossover probability is associated with this operator. In our case, two parents are selected among the current population. A uniform probability pick in $[0,1]$ written $u$ determines the parameter used in computing the features (decision space coordinates) of the children. In the following equations, $child0-1[j]$ is the $j^{th}$ coordinate of the generated child decision vector, $parent0-1[j]$ the $j^{th}$ coordinate of the parent associated with the child.
 
 \begin{itemize}
 \item if the uniform probability pick $\leq 0.5$:
@@ -369,35 +376,54 @@ child1[j] = 0.5((1-\beta_q)parent0[j]+(1+\beta_q)parent1[j])
 \end{equation}
 \end{itemize}
 
-Regarding the hyperparameter $\mu$, formulas were taken from \cite{compute_mu}. In the article this parameter is referred to as $\eta_c$. A large $\eta_c$ implies an offspring close to the parents in coordinates. For a smaller $\eta_c$, children solutions tend to differ more from their parents. This parameter is therefore essential to controlling the spread of the offspring.
+Regarding the hyperparameter $\mu$, formulas were taken from \cite{compute_mu}. In the article, this parameter is referred to as $\eta_c$. A large $\eta_c$ implies an offspring close to the parents in coordinates. For a smaller $\eta_c$, children solutions tend to differ more from their parents. This parameter is therefore essential to controlling the spread of the offspring.
 % http://www.cs.bham.ac.uk/~wbl/biblio/gecco2007/docs/p1187.pdf
 
 \section{Description of implementation}
 
 \subsection{Asymptotic analysis}
 
+In order to run the algorithm in a acceptable time, we needed to analyze the
+complexity of each step. \\
+First, let $P$ be the population size, $d$ the space's dimension, $I$ the
+indicator function, $do$ the
+tested function, $r$ the recombination rate, and $v$ the mutation rate.
+Furthermore, at the end of a generation, we have a population size of
+$O(P(1+r+v(1+r))= O(P)$, which doesn't change our analysis.
 
-
-Pour nous permettre de faire fonctionner l'algorithme dans un temps de décent il faut analyser les complexités de chaque étape, posons, $I$ le nombre d'époques de notre algorithme, $P$ la population, $d$ la dimention de l'espace, $do$ le nombre de fonction objectif, $r$ le taut de recombination, et $v$ le taut de mutation, de plus la fin d'une époque on se obtient une population de taille $O(P(1+r+v(1+r))= O(P)$ ceci ne change pas notre analyse asymptotique.
 \begin{itemize}
-\item step 1 : a un temps d'execution en $O(P*d)$ c'est la construction du nouvel ensemble
-\item step 2 : $O(P^2*d)$ il faut $P^2$ opération pour calculer touts les $I(x_1,x_2)$ pour la fonction $F$ et pour calculer $c= max|I|$
-\item step 3 : si $P$ est représenté sous forme d'un ensemble (en hashmap) cette étape prend $O(P)$
-\item step 4 : s'exécutre en temps constant
-\item setp 5 : s'exécutre en $O(P)$
-\item step 6 : s'exécutre en $O(P*d)$
+\item step 1 : $O(P\times d)$ to initialize the population
+\item step 2 : $O(P^2\times d)$. We need $P^2$ to calculate every $I(x_1, x_2)$
+  for the fitness assignment and compute $c = max(I)$
+\item step 3 : if $P$ is stored in a hashmap, this takes $O(P)$
+\item step 4 : done in $O(1)$
+\item step 5 : done in $O(P)$
+\item step 6 : done in $O(P\times d)$
 \end{itemize}
 
-Nous remarquons que le nombre d'éléments choisis 
+We see that the number of chosen elements is, empirically, $0.56\times P$. In
+fact, the best elements according to fitness values are chosen multiple times.
+The $k^{th}$ element has a probability of $(2(P-k))+1)/(P^2)$ to be chosen. \\
 
-Nous considérons le temps d'appel à la fonction $I_\epsilon$ en temps $do$ car elles est utilisée uniquement élément par élément : $I_\epsilon({x_1},{x_2})$, dans ce cas la le calcul revient à un calcul de max.
+We consider time complexity of $I_\epsilon$ the same as $do$ because they are
+only computed for sets of a single element, $I_\epsilon({x_1},{x_2})$ which
+equals to computing a max.
 
 \subsection{Code acceleration (non asymptotic)}
 
-Les améliorations suivantes ont permis de gagner un facteur 10 dans le temps d'exécution global de notre code.
-Avec les outils de profiling de python nous avons observé que la fonction la plus appelé était $I_\epsilon$ et de loin. Améliorer son temps de plusieurs manières possible nous a été grandement utilse. Pour cela que dans un premier temps nous avons chercher à ne jamais la recalculer cette fonction et de la stoker dans une hashmap. Puis poru améliorer le temps d'exeucution de $I_\epsilon$ nous avons recodé la fonction max en dur, au lieu d'utiliser celle fourni par les bibiotheques. Puis dans un souci d'otimisation nous avons fourni une implémentation pour uniquement 2 coordonés, effectivement les tests sur lesquells nous allons faire fonctionner notre algorithmme sont bbob-biobj ce qui nous a permis de gagner un temps conséquent.
+The following improvements allowed us to be globally 10 times faster.
+With python's profiling tools, we saw that the function which was called the
+most was by far $I_\epsilon$. \\
+Improve its computation time was quite useful. First, we stored every computed
+value in a hashmap to avoid having to compute it again later. We also hard-coded
+a max function instead of using those provided by libraries.\\
+In order to further optimize, implemented a specialized function for only two
+objectives, because multiobjective functions provided by the COCO test suite are
+in fact bi-objective.\\
+The objective functions being externally provided, and knowing nothing about
+their computation time, we decided to call them the least we could, by storing
+every computed value in a hashmap.
 
-Les fonctions objectif étant fournies par l'exterieur, et ne sachant rien à priori sur leurs temps d'exécution, nous avons aussi préféré ne jamais demander plus d'une fois leur valeurs, en les stoquant dans une hashmap.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{CPU Timing}
@@ -446,7 +472,7 @@ Mean times for function evaluation were as described in table~\ref{tab:funeval}.
                                         & 1.0e-03 & 1.3e-03\\
   \hline
 \end{tabular}
-\begin{tabular}{|p{3cm}|p{3cm}|}
+\begin{tabular}{|p{3.2cm}|p{3cm}|}
   \hline
   \diagbox{Batch}{Dimension} & 40\\
   \hline
@@ -492,7 +518,7 @@ size of the initial population or the maximum number of generations would have
 probably improved our results. Furthermore, the initial population was randomly
 generated in the range -5 to 5, for which we failed to find a better solution.
 Nevertheless, the results of this implementation of an adaptive IBEA algorithm
-was still good, according to the benchmarking realized with the Coco platform.
+was still good, according to the benchmarking realized with the COCO platform.
 In the end, compared to the results of other algorithms visible in the coco
 archives at
 \url{http://coco.gforge.inria.fr/ppdata-archive/bbob-biobj/2016-all/}, our
@@ -507,8 +533,7 @@ than smaller ones.
   \do\E\do\F\do\G\do\H\do\I\do\J\do\K\do\L\do\M\do\N%
   \do\O\do\P\do\Q\do\R\do\S\do\T\do\U\do\V\do\W\do\X%
   \do\Y\do\Z}
-NSGA-II is a very famous multi-objective optimization algorithm. It has three special characteristics: fast non-dominated sorting approach, fast crowded distance estimation procedure and simple crowded comparison operator. And it has been used successfully in lots of multi-objective optimization problems. We take the data obtained by NSGA-II algorithm from the following link: \\ \url{http://coco.gforge.inria.fr/data-archive/bbob-biobj/2016/NSGA-II-MATLAB_Auger_bbob-biobj.tgz} \\
-\\
+NSGA-II is a very famous multi-objective optimization algorithm. It has three special characteristics: fast non-dominated sorting approach, fast crowded distance estimation procedure and simple crowded comparison operator. And it has been used successfully in lots of multi-objective optimization problems. We take the data obtained by NSGA-II algorithm from the following link: \\ \url{http://coco.gforge.inria.fr/data-archive/bbob-biobj/2016/NSGA-II-MATLAB_Auger_bbob-biobj.tgz}\\
 
 The basic idea of the Random search algorithm is to randomly select some points according to certain criteria, then put these points into the functions, and keep the best points from them for the next iteration. It is essentially a violent search mechanism, but when the number of evalutions is greatly increased, it can also achieve good results. We take the data obtained by Random search algorithm from the following link: \\
 \url{http://coco.gforge.inria.fr/data-archive/bbob-biobj/2016/RANDOMSEARCH-5_Auger_bbob-biobj.tgz} \\
@@ -544,12 +569,12 @@ Best for 40-D & Best evaluated function & Worst evaluated function\\
 \end{table}
 
 
-From the above table we can see that, in general, NSGA-II is the best algorithm,
+From the above table and Figures~\ref{fig:random_search_NSGA} and~\ref{fig:AdaptiveIBEA}, we can see that, in general, NSGA-II is the best algorithm,
 its evaluation is not too big, but it can get the best results. IBEA is also a
 good algorithm, it does not need too many evaluations, but it can also get good
 results. And according to the estimation of COCO, its best value can exceed
 Random search (if the algorithm does more evaluations). In contrast, the effect
-of Random search is not very good, it need too many evaluations to get a good
+of Random search is not very good, it needs too many evaluations to get a good
 value, and when the dimension of input becomes higher, the algorithm is not so
 effective. From the last two columns of the table, we can see that different
 algorithms have different optimization capabilities for each function, and f53
@@ -577,9 +602,26 @@ Adaptive IBEA.
 
 \section{Conclusion}
 
-In this paper, an indicator-based evolutionary algorithm (IBEA) specifically with $\epsilon$ indicator was studied and implemented. Since it can be adapted to the preferences of the user and does not require any additional diversity preservation mechanism. We benchmarked it with COCO platform which enables us to compare the algorithm's performance with other well known multiobjective evolutionary algorithms (MOEAs). In our experiments, we majorly focused on the comparison with NSGA-II and random search. In the original paper of IBEA\cite{IBEA_base}, the author revealed that IBEA has been shown to generate significantly better results on six of eight benchmark problems in comparison to NSGA-II and SPEA2. However, we did not have a result as well as theirs. Overall, in our expriment IBEA outperformed Random search. A relatively good Pareto set approximations was given by IBEA. But IBEA performed less well as NSGA-II. Nevertheless, this could be biased. Since potential factors that may impact performance need to be taken into account. Another way of initialization the original population, other methods of implementing mutation and recombination (e.g. using other operators), or just abundant computing power, and all other hyperparameters impact directly a MOEA algorithm's performance. 
+In this paper, an indicator-based evolutionary algorithm (IBEA) specifically
+with $\epsilon$ indicator was studied and implemented. Since it can be adapted
+to the preferences of the user, it does not require any additional diversity
+preservation mechanism. We benchmarked it with COCO platform, which enables us
+to compare the algorithm's performance with other well-known multiobjective
+evolutionary algorithms (MOEAs). In our experiments, we majorly focused on the
+comparison with NSGA-II and Random search. In the original paper of IBEA, the
+author revealed that IBEA has been shown to generate significantly better
+results on six of eight benchmark problems in comparison to NSGA-II and SPEA2.
+However, we did not have a result as good as theirs. Overall, in our experiment,
+IBEA outperforms Random search, so a relatively good Pareto set approximations
+was given by IBEA, but IBEA performs worse than NSGA-II. Nevertheless, this
+could be biased, since potential factors that may impact performance need to be
+taken into account. Another way of initializing the original population, other
+methods of implementing mutation and recombination (other operators are used),
+or just bigger computing power, and all other hyperparameters are directly
+impacting the algorithm's performance. 
 
-Implementing a well behaved optimisation algorithm is a very empirical and challenging work. It may take an expert's years of experience and insight. One problem that really confused us is about the choice of mutation index parameter ($\eta_m$). In the paper\cite{deb1999}, Deb and Agrawal suggested that a value $\eta_m$ $\in$[20, 100] is adequate in most problems that they tried. To our surprise, when we changed $\eta_m$ from 25 (by default) to 1, our result improved significantly. Therefore we believe that further refinement of these hyperparameters will lead to a much desired result.
+Implementing a well behaved optimisation algorithm is a very empirical and
+challenging work. It may take a lot of an expert's insight and years of experience. One problem that really confused us is about the choice of mutation index parameter ($\eta_m$). In the paper\cite{deb1999}, Deb and Agrawal suggested that a value $\eta_m$ $\in$[20, 100] is adequate in most problems that they tried. To our surprise, when we changed $\eta_m$ from 25 (by default) to 1, our result improved significantly. We do believe that further refinement of these hyperparameters will lead to a much better result.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
