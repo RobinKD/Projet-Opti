@@ -33,10 +33,7 @@ class IBEA :
 			Basic IBEA step 1, map x in P to F(x)
 			calculle pour tout x_1 de p : $\sum_{x_2\in P\{x1\}}-e^{-I({x_2,x_1})/k}$
 		"""
-		#self.F.clear()
-		#vI= (lambda x: np.vectorize(self.cur_indic)(np.array(list(self.P)),x))
 		scale = self.fitval*self.cfit
-		#print(self.cfit)
 		if scale == 0:
 			print("div par zero")
 		for x in self.P:
@@ -44,12 +41,9 @@ class IBEA :
 
 	def addaptive_fit(self):
 		"""
-			Adaptive IBEA, rescale les fonctions objectif dans cur_objective construit cur_indic  en fonctions de ces nouvelles fonctions.
+			Adaptive IBEA, rescale ojective fucntion and calculate $I(x,y) forall x\neq y$
 			
 		"""
-		
-		# rescale objective
-		#fx= [self.objective(x) for x in self.P]
 
 		for x in self.P:
 			if x not in self.static_objective:
@@ -70,11 +64,9 @@ class IBEA :
 		for x, obx in self.cur_objective.items():#la partie la plus lente (encore a cause de I_epsilon)
 			self.cur_indic[x]= dict()
 			for y, oby in self.cur_objective.items():
-				cur = -self.I(oby, obx)
-				self.cur_indic[x][y]= cur#on inverse x y pour avoir une opti dans fit
+				cur = -self.I(oby, obx)#on inverse x y pour avoir une opti dans fit
+				self.cur_indic[x][y]= cur
 				self.cfit=max(self.cfit, abs(cur))
-				#print(self.static_objective[x], self.static_objective[y])
-		#print(self.cfit)
 
 		self.fit()
 		return 
@@ -84,13 +76,13 @@ class IBEA :
 		"""
 			step 3
 		"""
-		l=len(self.P)
+		l = len(self.P)
 		while l > self.alpha:
-			x= min(self.F.items(), key= (lambda x: x[1]))[0]
+			x = min(self.F.items(), key= (lambda x: x[1]))[0]
 			self.P.remove(x)
-			l-=1
 			del self.F[x]
 			self.updateF(x)
+			l-=1
 
 
 	def updateF(self, el):
@@ -100,7 +92,7 @@ class IBEA :
 		"""
 		scale = self.fitval*self.cfit
 		for y in self.P:
-			self.F[y]+= math.exp(self.cur_indic[y][el]/(scale))
+			self.F[y]+= math.exp(self.cur_indic[y][el]/scale)
 
 
 	def terminaison(self): 
@@ -214,9 +206,9 @@ class IBEA :
 		for i in range(pop_size):
 			cur = list()
 			for j in range(self.dim):
-				u= fun.upper_bounds[j]
-				l= fun.lower_bounds[j]
-				cur.append(mod_affine(random.random(),u,l))
+				#u= fun.upper_bounds[j]
+				#l= fun.lower_bounds[j]
+				cur.append(mod_affine(random.random(),-5,5))
 			out.add(tuple(cur))
 		return out
 
@@ -231,17 +223,7 @@ class IBEA :
 
 
 
-
-def I_epsilon(l, A, B):#gerer les positifs négatifs
-	m=-100
-	i=0
-	while i < l:
-		c= A[i]-B[i]
-		if m < c:
-			m=c
-		i+=1
-	return m
-def bin_epsilon(A, B):#gerer les positifs négatifs
+def bin_epsilon(A, B):#in fact we have only biobj (this is much faster than np.max(A-B))
 	x= A[0]-B[0]
 	y= A[1]-B[1]
 	if x >y:
@@ -249,15 +231,25 @@ def bin_epsilon(A, B):#gerer les positifs négatifs
 	else :
 		return y
 
-#import cProfile, pstats
+def I_epsilon(A, B):#general case for l dimentional objective function
+	m=-100
+	i=0
+	l = len(A)
+	while i < l:
+		c= A[i]-B[i]
+		if m < c:
+			m=c
+		i+=1
+	return m
+
+#import cProfile, pstats #prifiling tools
 #from pstats import SortKey
 
 def myIBEA(fun, pop_size, num_max_gen, fit_scale_fact):
-	ibea = IBEA(pop_size, fun.dimension, num_max_gen, fit_scale_fact, fun, I_epsilon)
 	if fun.number_of_objectives == 2:
 		I_eps = bin_epsilon
 	else:
-		I_eps =(lambda x,y : I_epsilon(fun.number_of_objectives, x,y))
+		I_eps = I_epsilon
 	ibea = IBEA(pop_size, fun.dimension, num_max_gen, fit_scale_fact, fun, I_eps)
 	#pr = cProfile.Profile()
 	#pr.enable()
