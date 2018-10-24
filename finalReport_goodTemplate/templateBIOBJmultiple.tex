@@ -374,7 +374,30 @@ Regarding the hyperparameter $\mu$, formulas were taken from \cite{compute_mu}. 
 
 \section{Description of implementation}
 
-\todo[inline]{Luca's work}
+\subsection{Asymptotic analysis}
+
+
+
+Pour nous permettre de faire fonctionner l'algorithme dans un temps de décent il faut analyser les complexités de chaque étape, posons, $I$ le nombre d'époques de notre algorithme, $P$ la population, $d$ la dimention de l'espace, $do$ le nombre de fonction objectif, $r$ le taut de recombination, et $v$ le taut de mutation, de plus la fin d'une époque on se obtient une population de taille $O(P(1+r+v(1+r))= O(P)$ ceci ne change pas notre analyse asymptotique.
+\begin{itemize}
+\item step 1 : a un temps d'execution en $O(P*d)$ c'est la construction du nouvel ensemble
+\item step 2 : $O(P^2*d)$ il faut $P^2$ opération pour calculer touts les $I(x_1,x_2)$ pour la fonction $F$ et pour calculer $c= max|I|$
+\item step 3 : si $P$ est représenté sous forme d'un ensemble (en hashmap) cette étape prend $O(P)$
+\item step 4 : s'exécutre en temps constant
+\item setp 5 : s'exécutre en $O(P)$
+\item step 6 : s'exécutre en $O(P*d)$
+\end{itemize}
+
+Nous remarquons que le nombre d'éléments choisis 
+
+Nous considérons le temps d'appel à la fonction $I_\epsilon$ en temps $do$ car elles est utilisée uniquement élément par élément : $I_\epsilon({x_1},{x_2})$, dans ce cas la le calcul revient à un calcul de max.
+
+\subsection{Code acceleration (non asymptotic)}
+
+Les améliorations suivantes ont permis de gagner un facteur 10 dans le temps d'exécution global de notre code.
+Avec les outils de profiling de python nous avons observé que la fonction la plus appelé était $I_\epsilon$ et de loin. Améliorer son temps de plusieurs manières possible nous a été grandement utilse. Pour cela que dans un premier temps nous avons chercher à ne jamais la recalculer cette fonction et de la stoker dans une hashmap. Puis poru améliorer le temps d'exeucution de $I_\epsilon$ nous avons recodé la fonction max en dur, au lieu d'utiliser celle fourni par les bibiotheques. Puis dans un souci d'otimisation nous avons fourni une implémentation pour uniquement 2 coordonés, effectivement les tests sur lesquells nous allons faire fonctionner notre algorithmme sont bbob-biobj ce qui nous a permis de gagner un temps conséquent.
+
+Les fonctions objectif étant fournies par l'exterieur, et ne sachant rien à priori sur leurs temps d'exécution, nous avons aussi préféré ne jamais demander plus d'une fois leur valeurs, en les stoquant dans une hashmap.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{CPU Timing}
