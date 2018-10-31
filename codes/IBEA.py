@@ -212,6 +212,7 @@ class IBEA :
 			out.add(tuple(cur))
 		return out
 
+
 	def run(self):
 		while not self.terminaison():
 			self.addaptive_fit()
