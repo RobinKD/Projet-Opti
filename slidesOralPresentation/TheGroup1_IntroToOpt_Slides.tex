@@ -9,6 +9,11 @@
 \usepackage{framed}
 \usepackage[super]{nth}
 
+\usepackage{tabularx}
+\usepackage{xspace}
+\usepackage{multirow}% http://ctan.org/pkg/multirow
+\usepackage{diagbox}
+
 
 \title{8 novembre 2018 - \insertframenumber/\inserttotalframenumber}
 %\subtitle{Using Beamer}
@@ -46,10 +51,10 @@ Black-Box Optimization Benchmarking\\ with the COCO platform\\ - \\Multiobjectiv
 \end{framed}
 }
 \vfill
-\begin{figure}
-\centering
-\includegraphics[scale=0.25]{logo_upsaclay.jpg}
-\end{figure}
+% \begin{figure}
+% \centering
+% \includegraphics[scale=0.25]{logo_upsaclay.jpg}
+% \end{figure}
 
 {\footnotesize \vfill \textit{Group 1:} Martin BAUW, Robin DURAZ, Jiaxin GAO,\\ Hao LIU, Luca VEYRON-FORRER}
 \end{center}
@@ -104,7 +109,87 @@ Black-Box Optimization Benchmarking\\ with the COCO platform\\ - \\Multiobjectiv
 \section{CPU timing and results}
 \subsection{CPU timing and results}
 \begin{frame}
+  \frametitle{Computer specifications and batch options}
+  \begin{itemize}
+  \item Intel(R) Core(TM) i7-7500U CPU @ 2.70GHz
+  \item Quad core CPU with 16GB RAM
+  \end{itemize}
+  \vspace{1em}
+  Everything ran with a budget of 100\\
+  \begin{itemize}
+  \item Three batchs for dimensions 2, 3, 5, 10, 20
+  \item First batch running alone, and two others together
+  \item One batch for dimensions 40
+  \end{itemize}
+\end{frame}
 
+\begin{frame}
+  \frametitle{Options chosen to run the algorithm}
+  \begin{itemize}
+  \item Population size : 100
+  \item Maximum number of generation : 100
+  \item Scaling factor : 0.05
+  \item Mutation rate : 0.01
+  \item Recombination and mutation mu : 1
+  \item Population initialization in range (-5, 5)
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  %\frametitle{Time by function evaluation}
+  \begin{table}[!htbp]
+    \begin{tabular}{|p{3.8cm}|p{1.5cm}|p{1.5cm}|p{1.5cm}|}
+      \hline
+      \diagbox{Batch}{Dimension} & 2 & 3 & 5\\
+      \hline
+      Batch 1 on 3 & 6.0e-04 & 6.3e-04 & 8.1e-04\\
+      \hline
+      \multirow{2}{3.8cm}{Batch 2 and 3 on 3 run simultaneously} & 8.6e-04 & 8.6e-04 & 9.1e-04\\
+      \cline{2-4}
+                                 & 8.3e-04 & 8.4e-04 & 8.9e-04\\
+      \hline
+    \end{tabular}
+    \begin{tabular}{|p{3.8cm}|p{2.47cm}|p{2.47cm}|}
+      \hline
+      \diagbox{Batch}{Dimension} & 10 & 20\\
+      \hline
+      Batch 1 on 3 & 8.3e-04 & 1.1e-03\\
+      \hline
+      \multirow{2}{3.8cm}{Batch 2 and 3 on 3 run simultaneously} & 1.1e-03 & 1.3e-03\\
+      \cline{2-3}
+                                 & 1.0e-03 & 1.3e-03\\
+      \hline
+    \end{tabular}
+    \begin{tabular}{|p{3.8cm}|p{5.37cm}|}
+      \hline
+      \diagbox{Batch}{Dimension} & 40\\
+      \hline
+      Whole test suite & 4.2e-03\\
+      \hline
+    \end{tabular}
+  \end{table}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Results}
+  \begin{figure}
+    \centering
+    \includegraphics[scale=0.5]{pprldmany}
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Results analysis}
+  \begin{itemize}
+  \item Comparatively better in higher dimensions
+  \item Results globally good for an EMOA
+  \end{itemize}
+  \begin{itemize}
+  \item More budget could have given better results
+  \item A better initialization of population could lead to a sharper increase
+    at the beginning
+  \end{itemize}
 \end{frame}
 
 \subsection{Comparision with NSGA 2 and Random Search}
