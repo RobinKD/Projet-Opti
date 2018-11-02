@@ -404,6 +404,7 @@ $O(P(1+r+v(1+r))= O(P)$, which doesn't change our analysis.
 \item step 6 : done in $O(P\times d)$
 \end{itemize}
 
+Furthermore, the complexity in memory is $O(P^2)$\\
 We see that the number of chosen elements is, empirically, $0.56\times P$. In
 fact, the best elements according to fitness values are chosen multiple times.
 The $k^{th}$ element has a probability of $(2(P-k))+1)/(P^2)$ to be chosen. \\
@@ -426,6 +427,17 @@ in fact bi-objective.\\
 The objective functions being externally provided, and knowing nothing about
 their computation time, we decided to call them the least we could, by storing
 every computed value in a hashmap.
+
+\subsection{Parallelization}
+
+Step 2, which is the most critical one, is perfectly parallelizable. Storing
+$-I_\epsilon(\{x\},\{y\})$ in a hashmap of hashmap do the job perfectly, while
+a unique hashmap would have caused problems. Doing this, other steps are also
+greatly parallelizable.\\
+However, implementing multi-threading to be more efficient would have been
+tedious and prone to errors. Considering that, we instead chose to stay with an easier
+implementation and run several instances of benchmarking together to
+better use computing units of our machines.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
