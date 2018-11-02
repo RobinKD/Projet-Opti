@@ -86,12 +86,59 @@ Black-Box Optimization Benchmarking\\ with the COCO platform\\ - \\Multiobjectiv
 
 \subsection{Selection and variation}
 \begin{frame}
-\frametitle{Mating selection and mutation}
-
+\frametitle{Recombination}
+For recombination, we use a Simulated Binary Crossover (SBX) operator. A uniform probability pick in $[0,1]$ written $u$ determines the parameter used in computing the features (decision space coordinates) of the children.
+\begin{itemize}
+\item if the uniform probability pick $\leq 0.5$:
+\begin{equation}
+\beta_q = (2u)^{\frac{1}{\mu +1}}
+\end{equation}
+\item else:
+\begin{equation}
+\beta_q = (\frac{1}{2(1-u)})^{\frac{1}{\mu +1}}
+\end{equation}
+\end{itemize}
 \end{frame}
 
 \begin{frame}
 \frametitle{Recombination}
+Thus, we can compute the children's coordinates:
+
+\begin{itemize}
+\item first child:
+\begin{equation}
+child0[j] = 0.5((1+\beta_q)parent0[j]+(1-\beta_q)parent1[j])
+\end{equation}
+\item second child:
+\begin{equation}
+child1[j] = 0.5((1-\beta_q)parent0[j]+(1+\beta_q)parent1[j])
+\end{equation}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Mating selection and mutation}
+Polynomial mutation operator:
+
+The mutation operator modifies individuals by changing small parts in the associated vectors according to a given mutation rate.
+
+\begin{itemize}
+\item if the uniform probability pick $\leq 0.5$:
+\begin{equation}
+\sigma_L = (2u)^{\frac{1}{\mu +1}}-1 
+\end{equation}
+\begin{equation}
+p_{mut}[j] = ind[j] + \sigma_L(ind[j]-Lo)
+\end{equation}
+\item else:
+\begin{equation}
+\sigma_R = (2(1-u))^{\frac{1}{\mu +1}} 
+\end{equation}
+\begin{equation}
+p_{mut}[j] = ind[j] + \sigma_R(Up-ind[j])
+\end{equation}
+\end{itemize}
 
 \end{frame}
 
@@ -205,7 +252,17 @@ Black-Box Optimization Benchmarking\\ with the COCO platform\\ - \\Multiobjectiv
 
 \section{Conclusion}
 \begin{frame}
-conclusion sur algo, implémentation, idées d'ouverture ?
+In our experiments, we majorly focused on the
+comparison with NSGA-II and Random search:
+\vskip 0.1in
+IBEA VS Random search: IBEA outperformed Random search, a relatively good Pareto set approximation was given by IBEA.
+ 
+IBEA VS NSGA-II: IBEA performed worse than NSGA-II.
+\vskip 0.1in
+Choosing a representation of the problem
+addressed, an initial population, a method of selection, a crossover operator,
+mutation operator, the probabilities of crossover and mutation, and the
+insertion method creates a variant of MOEAs algorithms. 
 \end{frame}
 
 \section{Bibliography}
