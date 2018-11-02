@@ -13,7 +13,7 @@
 \usepackage{xspace}
 \usepackage{multirow}% http://ctan.org/pkg/multirow
 \usepackage{diagbox}
-
+\usepackage{changepage}
 
 \title{8 novembre 2018 - \insertframenumber/\inserttotalframenumber}
 %\subtitle{Using Beamer}
@@ -66,22 +66,57 @@ Black-Box Optimization Benchmarking\\ with the COCO platform\\ - \\Multiobjectiv
 
 \section{Introduction}
 \begin{frame}
-
+IBEA: Indicator-Based Evolutionary Algorithm
+\begin{itemize}
+\item optimization: find decision space vectors leading to objective space minima
+\item multiobjective: the objective space is multidimensional
+\item evolutionary: decision space candidates follows an natural selection-like evolution
+\item indicator-based: binary quality indicators to compare two Pareto set approximations
+\end{itemize}
 \end{frame}
 
 
 \section{The algorithm}
 \subsection{Overview of IBEA}
 \begin{frame}
-\begin{itemize}
-\item steps description
-\end{itemize}
+\begin{columns}[T]
+\begin{column}{.48\textwidth}
+Successive steps of IBEA:
+\begin{enumerate}
+\item Initialization
+\item Fitness assignment % scale each objective to [0,1], calculate Is then c then fitness values
+\item Environmental selection % update fitness values thanks to F()
+\item Termination
+\item Mating selection
+\item Variation
+\end{enumerate}
+\end{column}
+\begin{column}{.48\textwidth}
+\includegraphics[scale=0.16]{stochasticSearchAlgorithm.png} \footnotemark
+\end{column}
+\end{columns}
+\footnotetext[1]{Illustration from:\\ \textit{A Tutorial on Evolutionary Multiobjective
+Optimization} - E. Zitzler, \\M. Laumanns, and S. Bleuler}
 \end{frame}
 
 
 \begin{frame}
-\frametitle{Binary quality indicators}
-
+\begin{adjustwidth}{-2.2em}{-2.2em}
+\begin{itemize}
+\item \underline{Binary quality indicators:}
+\begin{equation}
+I_{\epsilon^+ (A,B)} = min_{\epsilon} \{\forall x^2 \in B\ \exists x^1 \in A : f_i(x^1) - \epsilon \leq f_i (x^2)\ for\ i \in \{1,...,n\}\}
+\end{equation}
+\item \underline{Fitness values:}
+\begin{equation}
+F(x^1) = \sum_{x^2 \in P \backslash \{x^1\}} -e^{-\dfrac{I(\{x^1\},\{x^2\})}{ck}}
+\end{equation}
+\end{itemize}
+\end{adjustwidth}
+\begin{center}
+\includegraphics[scale=0.2]{binaryIndicators.png} \footnotemark
+\end{center}
+\footnotetext[1]{Illustration from:\\ \textit{Indicator-Based Selection in Multiobjective Search} - E. Zitzler and S. Künzli}
 \end{frame}
 
 \subsection{Selection and variation}
@@ -268,7 +303,11 @@ insertion method creates a variant of MOEAs algorithms.
 \section{Bibliography}
 \begin{frame}
 \frametitle{Non-exhaustive bibliography}
-
+\begin{itemize}
+\item \textit{Indicator-Based Selection in Multiobjective Search} - Zitzler, E. and Künzli, S.
+\item \textit{A Tutorial on Evolutionary Multiobjective Optimization} - Zitzler, E. and Laumanns, M. and Bleuler, S.
+\item \textit{Biobjective Performance Assessment with the {COCO} Platform} - Brockhoff, D. and Tu{\v s}ar, T. and Tu{\v s}ar, D. and Wagner, T. and Hansen, N. and Auger, A.
+\end{itemize}
 \end{frame}
 
 \end{document}
