@@ -180,12 +180,21 @@ p_{mut}[j] = ind[j] + \sigma_R(Up-ind[j])
 \section{Our implementation}
 \subsection{Code structure}
 \begin{frame}
-
+  \begin{itemize}
+    \item Code build for the most general case.
+    \item The IBEA code is in the class IBEA, where each method implements one step of the algorithm.
+    \item No difficulty to get to the best asymptotic complexity.
+  \end{itemize}
 \end{frame}
 
 \subsection{Improvements regarding the execution speed}
 \begin{frame}
-
+  \begin{itemize}
+    \item Good data structures choices.
+    \item The Indicatior fuction was the key.
+    \item From the first implementation, to the last we divided by 4.5 the execution time.
+  \end{itemize}
+ 
 \end{frame}
 
 \section{CPU timing and results}
