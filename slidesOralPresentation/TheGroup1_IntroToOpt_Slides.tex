@@ -116,23 +116,40 @@ F(x^1) = \sum_{x^2 \in P \backslash \{x^1\}} -e^{-\dfrac{I(\{x^1\},\{x^2\})}{ck}
 \begin{center}
 \includegraphics[scale=0.2]{binaryIndicators.png} \footnotemark
 \end{center}
-\footnotetext[1]{Illustration from:\\ \textit{Indicator-Based Selection in Multiobjective Search} - E. Zitzler and S. Künzli}
+\footnotetext[2]{Illustration from:\\ \textit{Indicator-Based Selection in Multiobjective Search} - E. Zitzler and S. Künzli}
 \end{frame}
 
 \subsection{Selection and variation}
+
+\begin{frame}
+\frametitle{Mating selection}
+Binary tournament selection
+\begin{itemize}
+    \item Two individuals randomly chosen from the population
+    \item Best individual kept in mating pool
+    \item Repeated until mating pool filled
+\end{itemize}
+\footnotetext[3]{\textit{A Tutorial on Evolutionary Multiobjective
+Optimization} - E. Zitzler, \\M. Laumanns, and S. Bleuler}
+\end{frame}
+
 \begin{frame}
 \frametitle{Recombination}
-For recombination, we use a Simulated Binary Crossover (SBX) operator. A uniform probability pick in $[0,1]$ written $u$ determines the parameter used in computing the features (decision space coordinates) of the children.
+For recombination, Simulated Binary Crossover (SBX) operator was chosen.  
+A random number $u$ created within $[0,1]$, as follows:
 \begin{itemize}
-\item if the uniform probability pick $\leq 0.5$:
+\item if $u$ $\leq 0.5$:
 \begin{equation}
-\beta_q = (2u)^{\frac{1}{\mu +1}}
+\beta_q = (2u)^{\frac{1}{\eta_c +1}}
 \end{equation}
 \item else:
 \begin{equation}
-\beta_q = (\frac{1}{2(1-u)})^{\frac{1}{\mu +1}}
+\beta_q = (\frac{1}{2(1-u)})^{\frac{1}{\eta_c +1}}
 \end{equation}
 \end{itemize}
+\footnotetext[1]{\textit{K. Deb and R. B. Agrawal. Simulated binary
+crossover for continuous search space. Complex
+Systems, 9(2):115–148, 1995.} }
 \end{frame}
 
 \begin{frame}
@@ -148,31 +165,37 @@ child0[j] = 0.5((1+\beta_q)parent0[j]+(1-\beta_q)parent1[j])
 \begin{equation}
 child1[j] = 0.5((1-\beta_q)parent0[j]+(1+\beta_q)parent1[j])
 \end{equation}
+\footnotetext[3]{\textit{K. Deb and R. B. Agrawal. Simulated binary
+crossover for continuous search space. Complex
+Systems, 9(2):115–148, 1995.} }
+
 \end{itemize}
 
 \end{frame}
 
 \begin{frame}
-\frametitle{Mating selection and mutation}
+\frametitle{Mutation}
 Polynomial mutation operator:
-
-The mutation operator modifies individuals by changing small parts in the associated vectors according to a given mutation rate.
+this mutation operator modifies individuals by changing small parts in the associated vectors according to a given mutation rate.
 
 \begin{itemize}
-\item if the uniform probability pick $\leq 0.5$:
+\item if $u$ $\leq 0.5$:
 \begin{equation}
-\sigma_L = (2u)^{\frac{1}{\mu +1}}-1 
+\sigma_L = (2u)^{\frac{1}{\eta_m +1}}-1 
 \end{equation}
 \begin{equation}
 p_{mut}[j] = ind[j] + \sigma_L(ind[j]-Lo)
 \end{equation}
 \item else:
 \begin{equation}
-\sigma_R = (2(1-u))^{\frac{1}{\mu +1}} 
+\sigma_R = (2(1-u))^{\frac{1}{\eta_m +1}} 
 \end{equation}
 \begin{equation}
 p_{mut}[j] = ind[j] + \sigma_R(Up-ind[j])
 \end{equation}
+\footnotetext[4]{\textit{K. Deb and S. Agrawal. A niched-penalty approach
+for constraint handling in genetic algorithms. In Parallel Problem Solving
+from Nature (PPSN-VI), pages 365–374, 2000.} }
 \end{itemize}
 
 \end{frame}
@@ -192,7 +215,8 @@ p_{mut}[j] = ind[j] + \sigma_R(Up-ind[j])
 \begin{itemize}
 \item Good data structures choices
 \item The Indicator function was the key
-\item From the first implementation to the last we divided the execution time by 4.5
+\item Execution time improvement : 59.6s to 12.7s per execution (divided by 4.6)
+
 \end{itemize}
 \end{frame}
 
@@ -220,7 +244,7 @@ p_{mut}[j] = ind[j] + \sigma_R(Up-ind[j])
   \item Maximum number of generation : 100
   \item Scaling factor : 0.05
   \item Mutation rate : 0.01
-  \item Recombination and mutation $\mu$ : 1
+  \item Recombination and mutation $\eta_m$ \& $\eta_c$ : 1
   \item Population initialization in range (-5, 5)
   \end{itemize}
 \end{frame}
@@ -273,7 +297,7 @@ p_{mut}[j] = ind[j] + \sigma_R(Up-ind[j])
   \frametitle{Results analysis}
   \begin{itemize}
   \item Comparatively better in higher dimensions
-  \item Results globally good for an EMOA
+  \item Results globally good for a MOEA
   \end{itemize}
   \begin{itemize}
   \item More budget could have given better results
@@ -282,42 +306,33 @@ p_{mut}[j] = ind[j] + \sigma_R(Up-ind[j])
   \end{itemize}
 \end{frame}
 
-\subsection{Comparision with Random Search and NSGA-II}
+\subsection{Comparison with Random Search and NSGA-II}
 
 \begin{frame}
 \frametitle{Random Search}
 \begin{itemize}
-\item The introduce of Random Search:
-\item Its effect is directly proportional to its evalutions
-\item It doesn't work well when the dimension of input is too high
+\item Its ECDF looks like linear functions
+\item It doesn't work well when the dimension is too high
+\item Globally worse than our algorithm
 \end{itemize}
 \centering \includegraphics[scale=0.35]{Random.png}
-
 \end{frame}
 
 \begin{frame}
 \frametitle{NSGA-II}
-\begin{itemize}
-\item The introduce of NSGA-II:
-\item The gap between our algorithm and it
-\end{itemize}
+Algorithm faster, although budget is much higher.\\
+It has slightly better results.\\
 \centering \includegraphics[scale=0.35]{NSGA.png}
 
 \end{frame}
 
 \section{Conclusion}
 \begin{frame}
-In our experiments, we majorly focused on the
-comparison with NSGA-II and Random search:
-\vskip 0.1in
-IBEA VS Random search: IBEA outperformed Random search, a relatively good Pareto set approximation was given by IBEA.
- 
-IBEA VS NSGA-II: IBEA performed worse than NSGA-II.
-\vskip 0.1in
-Choosing a representation of the problem
-addressed, an initial population, a method of selection, a crossover operator,
-mutation operator, the probabilities of crossover and mutation, and the
-insertion method creates a variant of MOEAs algorithms. 
+\begin{itemize}
+    \item Overall satisfaction with our results.
+    \item Parameter tuning could be further studied.
+    \item Modification of small modules of MOEA.
+\end{itemize}
 \end{frame}
 
 \section{Bibliography}
