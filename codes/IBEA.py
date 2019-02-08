@@ -71,7 +71,6 @@ class IBEA :
 				self.cur_indic[x][y]= cur#on inverse x y pour avoir une opti dans fit
 				self.cfit=max(self.cfit, abs(cur))
 				#print(self.static_objective[x], self.static_objective[y])
-		#print(self.cfit)
 
 		self.fit()
 		return 
