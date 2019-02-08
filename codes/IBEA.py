@@ -5,14 +5,12 @@ import math
 
 
 
-#suppose I(x,x)=0 
-
 
  
 
 class IBEA :
 	def __init__(self, alpha, dim, gen, fit, objective,indic):
-		self.alpha  = alpha 
+		self.alpha  = alpha
 		self.gen = gen# nbde génération max
 		self.dim = dim
 		self.outdim = objective.number_of_objectives
