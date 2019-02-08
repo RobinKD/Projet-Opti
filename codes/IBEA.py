@@ -47,7 +47,6 @@ class IBEA :
 		"""
 		
 		# rescale objective
-		#fx= [self.objective(x) for x in self.P]
 
 		for x in self.P:
 			if x not in self.static_objective:
